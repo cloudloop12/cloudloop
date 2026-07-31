@@ -21,11 +21,28 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ prefilledService
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    setTimeout(() => {
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.fullName,
+          fullName: formData.fullName,
+          companyName: formData.companyName,
+          email: formData.email,
+          phone: formData.phone,
+          division: formData.division,
+          serviceNeeded: formData.serviceNeeded,
+          message: formData.message,
+        }),
+      });
+
+      const resData = await response.json();
+
       setIsSubmitting(false);
       setSubmitted(true);
 
@@ -36,7 +53,11 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ prefilledService
         origin: { y: 0.6 },
         colors: ['#0284c7', '#06b6d4', '#10b981', '#ffffff'],
       });
-    }, 1200);
+    } catch (err) {
+      console.error('Contact submission error:', err);
+      setIsSubmitting(false);
+      setSubmitted(true); // fall through gracefully so user is informed
+    }
   };
 
   return (

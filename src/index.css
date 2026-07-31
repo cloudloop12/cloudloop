@@ -52,7 +52,7 @@
   --accent-blue: #1d4ed8;
   --accent-emerald: #059669;
 
-  --shadow-card: 0 10px 30px -5px rgba(0, 0, 0, 0.06), 0 4px 12px rgba(0, 0, 0, 0.03);
+  --shadow-card: 0 10px 30px -5px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.03);
   --input-bg: #ffffff;
 
   color-scheme: light;
@@ -176,6 +176,14 @@ body {
   .bg-slate-800, .bg-slate-800\/80, .bg-slate-800\/50, .bg-slate-800\/60 {
     background-color: #e2e8f0 !important;
   }
+  input, select, textarea {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border-color: #cbd5e1 !important;
+  }
+  input::placeholder, textarea::placeholder {
+    color: #94a3b8 !important;
+  }
   .text-white, .text-slate-100, .text-slate-50 {
     color: var(--text-heading) !important;
   }
@@ -190,6 +198,10 @@ body {
   }
   .hover\:bg-slate-900\/80:hover, .hover\:bg-slate-900:hover, .hover\:bg-slate-800:hover {
     background-color: #e2e8f0 !important;
+  }
+  .hover\:border-cyan-500\/50:hover, .hover\:border-cyan-500:hover {
+    border-color: #0284c7 !important;
+    box-shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.15);
   }
   .bg-gradient-to-b.from-slate-900.to-slate-950, 
   .bg-gradient-to-br.from-slate-950.via-slate-900.to-slate-950 {
@@ -211,6 +223,14 @@ body {
   .bg-slate-800, .bg-slate-800\/80, .bg-slate-800\/50, .bg-slate-800\/60 {
     background-color: #dfd7cc !important;
   }
+  input, select, textarea {
+    background-color: #fdfbf7 !important;
+    color: #1c1815 !important;
+    border-color: #ded6cc !important;
+  }
+  input::placeholder, textarea::placeholder {
+    color: #80766d !important;
+  }
   .text-white, .text-slate-100, .text-slate-50 {
     color: var(--text-heading) !important;
   }
@@ -225,6 +245,10 @@ body {
   }
   .hover\:bg-slate-900\/80:hover, .hover\:bg-slate-900:hover, .hover\:bg-slate-800:hover {
     background-color: #ded6cc !important;
+  }
+  .hover\:border-cyan-500\/50:hover, .hover\:border-cyan-500:hover {
+    border-color: #2a7375 !important;
+    box-shadow: 0 8px 20px -5px rgba(42, 115, 117, 0.15);
   }
   .bg-gradient-to-b.from-slate-900.to-slate-950, 
   .bg-gradient-to-br.from-slate-950.via-slate-900.to-slate-950 {

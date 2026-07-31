@@ -23,6 +23,8 @@ import { ContactPage } from './pages/ContactPage';
 import { BlogPage } from './pages/BlogPage';
 import { BlogPostPage } from './pages/BlogPostPage';
 import { CareersPage } from './pages/CareersPage';
+import { NotFoundPage } from './pages/NotFoundPage';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 import { DivisionType } from './types';
 
@@ -81,76 +83,81 @@ export default function App() {
       />
 
       {/* Application Routes */}
-      <main>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <HomePage
-                onOpenConsultation={handleOpenConsultation}
-                activeDivisionFilter={activeDivisionFilter}
-                onSelectDivisionFilter={handleSelectDivisionFilter}
-              />
-            }
-          />
-          <Route
-            path="/about"
-            element={<AboutPage onOpenConsultation={handleOpenConsultation} />}
-          />
+      <ErrorBoundary>
+        <main>
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <HomePage
+                  onOpenConsultation={handleOpenConsultation}
+                  activeDivisionFilter={activeDivisionFilter}
+                  onSelectDivisionFilter={handleSelectDivisionFilter}
+                />
+              }
+            />
+            <Route
+              path="/about"
+              element={<AboutPage onOpenConsultation={handleOpenConsultation} />}
+            />
 
-          {/* Documents Clearing Division Routes */}
-          <Route
-            path="/documents-clearing"
-            element={<DocumentsClearingPage onOpenConsultation={handleOpenConsultation} />}
-          />
-          <Route
-            path="/documents-clearing/:slug"
-            element={<DocServiceDetailPage onOpenConsultation={handleOpenConsultation} />}
-          />
+            {/* Documents Clearing Division Routes */}
+            <Route
+              path="/documents-clearing"
+              element={<DocumentsClearingPage onOpenConsultation={handleOpenConsultation} />}
+            />
+            <Route
+              path="/documents-clearing/:slug"
+              element={<DocServiceDetailPage onOpenConsultation={handleOpenConsultation} />}
+            />
 
-          {/* IT Division Routes */}
-          <Route
-            path="/information-technology"
-            element={<ITPage onOpenConsultation={handleOpenConsultation} />}
-          />
-          <Route
-            path="/information-technology/:slug"
-            element={<ITServiceDetailPage onOpenConsultation={handleOpenConsultation} />}
-          />
+            {/* IT Division Routes */}
+            <Route
+              path="/information-technology"
+              element={<ITPage onOpenConsultation={handleOpenConsultation} />}
+            />
+            <Route
+              path="/information-technology/:slug"
+              element={<ITServiceDetailPage onOpenConsultation={handleOpenConsultation} />}
+            />
 
-          {/* Key Inner Pages */}
-          <Route
-            path="/why-choose-us"
-            element={<WhyChooseUsPage onOpenConsultation={handleOpenConsultation} />}
-          />
-          <Route
-            path="/process"
-            element={<ProcessPage onOpenConsultation={handleOpenConsultation} />}
-          />
-          <Route
-            path="/reviews"
-            element={<ReviewsPage onOpenConsultation={handleOpenConsultation} />}
-          />
-          <Route
-            path="/faqs"
-            element={<FAQsPage onOpenConsultation={handleOpenConsultation} />}
-          />
-          <Route
-            path="/contact"
-            element={<ContactPage />}
-          />
+            {/* Key Inner Pages */}
+            <Route
+              path="/why-choose-us"
+              element={<WhyChooseUsPage onOpenConsultation={handleOpenConsultation} />}
+            />
+            <Route
+              path="/process"
+              element={<ProcessPage onOpenConsultation={handleOpenConsultation} />}
+            />
+            <Route
+              path="/reviews"
+              element={<ReviewsPage onOpenConsultation={handleOpenConsultation} />}
+            />
+            <Route
+              path="/faqs"
+              element={<FAQsPage onOpenConsultation={handleOpenConsultation} />}
+            />
+            <Route
+              path="/contact"
+              element={<ContactPage />}
+            />
 
-          {/* Blog Routes */}
-          <Route path="/blog" element={<BlogPage />} />
-          <Route
-            path="/blog/:slug"
-            element={<BlogPostPage onOpenConsultation={handleOpenConsultation} />}
-          />
+            {/* Blog Routes */}
+            <Route path="/blog" element={<BlogPage />} />
+            <Route
+              path="/blog/:slug"
+              element={<BlogPostPage onOpenConsultation={handleOpenConsultation} />}
+            />
 
-          {/* Careers Route */}
-          <Route path="/careers" element={<CareersPage />} />
-        </Routes>
-      </main>
+            {/* Careers Route */}
+            <Route path="/careers" element={<CareersPage />} />
+
+            {/* 404 Catch All Route */}
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </main>
+      </ErrorBoundary>
 
       {/* Global Corporate Footer */}
       <Footer

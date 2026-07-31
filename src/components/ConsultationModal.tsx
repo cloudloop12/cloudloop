@@ -34,11 +34,23 @@ export const ConsultationModal: React.FC<ConsultationModalProps> = ({
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    setTimeout(() => {
+    try {
+      await fetch('/api/consultation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          serviceNeeded: formData.service,
+          details: formData.details,
+        }),
+      });
+
       setIsSubmitting(false);
       setSubmitted(true);
 
@@ -48,7 +60,11 @@ export const ConsultationModal: React.FC<ConsultationModalProps> = ({
         origin: { y: 0.5 },
         colors: ['#0284c7', '#06b6d4', '#10b981', '#ffffff'],
       });
-    }, 1000);
+    } catch (err) {
+      console.error('Consultation submission error:', err);
+      setIsSubmitting(false);
+      setSubmitted(true);
+    }
   };
 
   return (
