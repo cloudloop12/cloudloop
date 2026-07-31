@@ -28,15 +28,15 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
       className="fixed bottom-3 inset-x-3 z-40 lg:hidden pointer-events-auto"
       aria-label="Mobile Navigation Bar"
     >
-      <div className="max-w-md mx-auto bg-slate-950/90 backdrop-blur-2xl border border-slate-800/90 rounded-full p-1.5 shadow-2xl shadow-cyan-950/50 flex items-center justify-between ring-1 ring-cyan-500/20">
+      <div className="max-w-md mx-auto bg-slate-950/90 [data-theme=light]:bg-white/95 [data-theme=eyecare]:bg-[#fbf8f3]/95 backdrop-blur-2xl border border-slate-800/90 [data-theme=light]:border-slate-300 [data-theme=eyecare]:border-[#ded6cc] rounded-full p-1.5 shadow-2xl flex items-center justify-between ring-1 ring-cyan-500/20">
         
         {/* 1. Home */}
         <Link
           to="/"
           className={`flex-1 flex flex-col items-center justify-center py-2 px-1 rounded-full transition-all duration-200 ${
             isActive('/') && location.pathname === '/'
-              ? 'text-cyan-400 bg-cyan-950/60 font-bold shadow-inner'
-              : 'text-slate-400 hover:text-slate-200'
+              ? 'text-cyan-400 [data-theme=light]:text-blue-700 [data-theme=eyecare]:text-[#2a7375] bg-cyan-950/60 [data-theme=light]:bg-blue-50 [data-theme=eyecare]:bg-[#eae4db] font-bold shadow-inner'
+              : 'text-slate-400 [data-theme=light]:text-slate-600 [data-theme=eyecare]:text-[#665d53] hover:text-slate-200'
           }`}
         >
           <Home className="w-5 h-5 mb-0.5" />
@@ -48,8 +48,8 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
           to="/documents-clearing"
           className={`flex-1 flex flex-col items-center justify-center py-2 px-1 rounded-full transition-all duration-200 ${
             isActive('/documents-clearing') || isActive('/information-technology')
-              ? 'text-cyan-400 bg-cyan-950/60 font-bold shadow-inner'
-              : 'text-slate-400 hover:text-slate-200'
+              ? 'text-cyan-400 [data-theme=light]:text-blue-700 [data-theme=eyecare]:text-[#2a7375] bg-cyan-950/60 [data-theme=light]:bg-blue-50 [data-theme=eyecare]:bg-[#eae4db] font-bold shadow-inner'
+              : 'text-slate-400 [data-theme=light]:text-slate-600 [data-theme=eyecare]:text-[#665d53] hover:text-slate-200'
           }`}
         >
           <Layers className="w-5 h-5 mb-0.5" />

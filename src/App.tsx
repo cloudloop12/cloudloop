@@ -6,6 +6,7 @@ import { Footer } from './components/Footer';
 import { ConsultationModal } from './components/ConsultationModal';
 import { WhatsAppButton } from './components/WhatsAppButton';
 import { BackToTop } from './components/BackToTop';
+import { ThemeSwitcher } from './components/ThemeSwitcher';
 
 // Pages
 import { HomePage } from './pages/HomePage';
@@ -62,7 +63,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-cyan-500 selection:text-slate-950">
+    <div className="min-h-screen bg-slate-950 [data-theme=light]:bg-[#f8fafc] [data-theme=eyecare]:bg-[#f4f0ea] text-slate-100 [data-theme=light]:text-slate-900 [data-theme=eyecare]:text-[#2c2724] font-sans transition-colors duration-300 selection:bg-cyan-500 selection:text-slate-950">
       <Preloader />
       <ScrollToTopOnNavigate />
 
@@ -164,9 +165,10 @@ export default function App() {
         preselectedService={preselectedService}
       />
 
-      {/* Floating Buttons */}
+      {/* Floating Buttons & Theme Customizer */}
       <WhatsAppButton />
       <BackToTop />
+      <ThemeSwitcher />
     </div>
   );
 }
