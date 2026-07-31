@@ -2,7 +2,6 @@ import express from 'express';
 import path from 'path';
 import dotenv from 'dotenv';
 import nodemailer from 'nodemailer';
-import { createServer as createViteServer } from 'vite';
 
 dotenv.config();
 
@@ -42,7 +41,7 @@ function addEmailLog(entry: Omit<EmailLogEntry, 'id' | 'timestamp'>) {
 
 // Transporter Helper Function
 export function getTransporter() {
-  const user = process.env.GMAIL_USER || 'mailtocloudloop@gmail.com';
+  const user = process.env.GMAIL_USER;
   const rawPass = process.env.GMAIL_APP_PASSWORD;
 
   if (!user || !rawPass) {
@@ -474,17 +473,43 @@ app.post('/api/newsletter', (req, res) => handleSubmission(req, res, 'Newsletter
 app.post('/api/career-apply', (req, res) => handleSubmission(req, res, 'Career Application'));
 
 // -------------------------------------------------------------
-// Vite Middleware / Static Server Integration
+// Vite Middleware / Static Server Integration & Global Error Handling
 // -------------------------------------------------------------
 
-async function start() {
-  if (process.env.NODE_ENV !== 'production') {
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: 'spa',
+// Global Express Error Handler to prevent raw HTML server error outputs
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error('[API Error]:', err);
+  if (!res.headersSent) {
+    res.setHeader('Content-Type', 'application/json');
+    res.status(500).json({
+      success: false,
+      error: err.message || 'Internal Server Error',
     });
-    app.use(vite.middlewares);
-  } else {
+  }
+});
+
+// Fallback for non-existent API routes to ensure JSON response
+app.use('/api/*', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.status(404).json({
+    success: false,
+    error: `API route ${req.originalUrl} not found`,
+  });
+});
+
+async function start() {
+  if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+    try {
+      const { createServer: createViteServer } = await import('vite');
+      const vite = await createViteServer({
+        server: { middlewareMode: true },
+        appType: 'spa',
+      });
+      app.use(vite.middlewares);
+    } catch (err) {
+      console.warn('Vite middleware skipped:', err);
+    }
+  } else if (!process.env.VERCEL) {
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
     app.get('*', (req, res) => {
@@ -497,7 +522,7 @@ async function start() {
   });
 }
 
-// Start standalone server only when executed directly
-if (process.env.VERCEL !== '1') {
+// Start standalone server only when executed directly (not inside Vercel serverless)
+if (process.env.VERCEL !== '1' && process.env.VERCEL !== 'true') {
   start();
 }

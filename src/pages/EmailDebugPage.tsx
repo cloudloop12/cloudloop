@@ -51,16 +51,44 @@ export const EmailDebugPage: React.FC = () => {
         fetch('/api/email/logs'),
       ]);
 
-      const statusData = await statusRes.json();
-      const logsData = await logsRes.json();
+      let statusData: SMTPStatus;
+      const statusContentType = statusRes.headers.get('content-type');
+      if (statusContentType && statusContentType.includes('application/json')) {
+        statusData = await statusRes.json();
+      } else {
+        const text = await statusRes.text();
+        statusData = {
+          connected: false,
+          authStatus: `Server returned non-JSON (${statusRes.status} ${statusRes.statusText})`,
+          gmailUser: 'N/A',
+          notificationEmail: 'N/A',
+          envLoaded: { GMAIL_USER: false, GMAIL_APP_PASSWORD: false, NOTIFICATION_EMAIL: false },
+          lastError: `Server error output: ${text.substring(0, 150)}...`,
+          totalLogs: 0,
+        };
+      }
+
+      let logsData = { logs: [] };
+      if (logsRes.ok && logsRes.headers.get('content-type')?.includes('application/json')) {
+        logsData = await logsRes.json();
+      }
 
       setStatus(statusData);
       setLogs(logsData.logs || []);
-      if (statusData.notificationEmail && !testRecipient) {
+      if (statusData.notificationEmail && statusData.notificationEmail !== 'N/A' && !testRecipient) {
         setTestRecipient(statusData.notificationEmail);
       }
     } catch (err: any) {
       console.error('Failed to fetch diagnostic data:', err);
+      setStatus({
+        connected: false,
+        authStatus: `Client Network Error: ${err.message || String(err)}`,
+        gmailUser: 'N/A',
+        notificationEmail: 'N/A',
+        envLoaded: { GMAIL_USER: false, GMAIL_APP_PASSWORD: false, NOTIFICATION_EMAIL: false },
+        lastError: err.message || String(err),
+        totalLogs: 0,
+      });
     } finally {
       setLoadingStatus(false);
     }
@@ -82,7 +110,17 @@ export const EmailDebugPage: React.FC = () => {
         body: JSON.stringify({ recipient: testRecipient }),
       });
 
-      const data = await response.json();
+      let data;
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        data = await response.json();
+      } else {
+        const errorText = await response.text();
+        data = {
+          success: false,
+          error: `Server HTTP ${response.status} non-JSON response: ${errorText.substring(0, 200)}`,
+        };
+      }
 
       if (data.success) {
         setTestResult({
@@ -237,6 +275,15 @@ export const EmailDebugPage: React.FC = () => {
                     <XCircle className="w-3.5 h-3.5" /> Missing in Env
                   </span>
                 )}
+              </div>
+            </div>
+
+            {/* Vercel Redeployment Notice */}
+            <div className="p-3 bg-amber-950/30 border border-amber-500/30 rounded-xl text-[11px] text-amber-300 leading-relaxed flex gap-2">
+              <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+              <div>
+                <strong className="block text-amber-200">Vercel Deployment Notice:</strong>
+                Environment variables set in Vercel settings require a <strong>new deployment (Redeploy)</strong> to take effect in serverless functions. If any variable shows "Missing in Env", go to your Vercel Dashboard → Deployments → Redeploy.
               </div>
             </div>
           </div>
