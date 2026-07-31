@@ -43,11 +43,14 @@ function addEmailLog(entry: Omit<EmailLogEntry, 'id' | 'timestamp'>) {
 // Transporter Helper Function
 export function getTransporter() {
   const user = process.env.GMAIL_USER || 'mailtocloudloop@gmail.com';
-  const pass = process.env.GMAIL_APP_PASSWORD;
+  const rawPass = process.env.GMAIL_APP_PASSWORD;
 
-  if (!user || !pass) {
+  if (!user || !rawPass) {
     return null;
   }
+
+  // Strip all whitespace spaces from Google App Passwords (e.g. "bkhn bkiu tgje lnmj" -> "bkhnbkiutgjelnmj")
+  const pass = rawPass.replace(/\s+/g, '').trim();
 
   return nodemailer.createTransport({
     service: 'gmail',
@@ -205,26 +208,43 @@ app.get('/api/health', (req, res) => {
 
 // SMTP Diagnostic Endpoint
 app.get('/api/email/status', async (req, res) => {
-  const user = process.env.GMAIL_USER || 'mailtocloudloop@gmail.com';
-  const pass = process.env.GMAIL_APP_PASSWORD;
-  const notificationEmail = process.env.NOTIFICATION_EMAIL || user;
+  const rawUser = process.env.GMAIL_USER;
+  const rawPass = process.env.GMAIL_APP_PASSWORD;
+  const rawNotification = process.env.NOTIFICATION_EMAIL;
+
+  const user = rawUser || 'mailtocloudloop@gmail.com';
+  const notificationEmail = rawNotification || user;
 
   const envLoaded = {
-    GMAIL_USER: !!process.env.GMAIL_USER,
-    GMAIL_APP_PASSWORD: !!process.env.GMAIL_APP_PASSWORD,
-    NOTIFICATION_EMAIL: !!process.env.NOTIFICATION_EMAIL,
+    GMAIL_USER: !!rawUser,
+    GMAIL_APP_PASSWORD: !!rawPass,
+    NOTIFICATION_EMAIL: !!rawNotification,
   };
+
+  const missingVars: string[] = [];
+  if (!rawUser) missingVars.push('GMAIL_USER');
+  if (!rawPass) missingVars.push('GMAIL_APP_PASSWORD');
+  if (!rawNotification) missingVars.push('NOTIFICATION_EMAIL');
+
+  const sanitizedPasswordLength = rawPass ? rawPass.replace(/\s+/g, '').length : 0;
+  const hasSpacesInPassword = rawPass ? /\s/.test(rawPass) : false;
 
   const transporter = getTransporter();
 
   if (!transporter) {
     return res.json({
       connected: false,
-      authStatus: 'Missing App Password or User in Environment',
+      authStatus: missingVars.length > 0 
+        ? `Missing Environment Variable(s): ${missingVars.join(', ')}` 
+        : 'GMAIL_APP_PASSWORD is missing',
       gmailUser: user,
       notificationEmail: notificationEmail,
       envLoaded,
-      lastError: 'GMAIL_APP_PASSWORD environment variable is not defined',
+      missingVars,
+      sanitizedPasswordLength,
+      hasSpacesInPassword,
+      platform: process.env.VERCEL ? 'Vercel Serverless' : 'Express / Container',
+      lastError: missingVars.length > 0 ? `Please verify Vercel environment variables: ${missingVars.join(', ')}` : 'GMAIL_APP_PASSWORD is not set',
       totalLogs: emailLogs.length,
     });
   }
@@ -233,21 +253,33 @@ app.get('/api/email/status', async (req, res) => {
     await transporter.verify();
     return res.json({
       connected: true,
-      authStatus: 'SMTP Connection & Authentication Verified Successful',
+      authStatus: 'SMTP Connection & Gmail Authentication Verified Successfully',
       gmailUser: user,
       notificationEmail: notificationEmail,
       envLoaded,
+      missingVars,
+      sanitizedPasswordLength,
+      hasSpacesInPassword,
+      platform: process.env.VERCEL ? 'Vercel Serverless' : 'Express / Container',
       lastError: null,
       totalLogs: emailLogs.length,
     });
   } catch (error: any) {
+    let detailedMsg = error.message || String(error);
+    if (detailedMsg.includes('535') || detailedMsg.includes('Username and Password not accepted')) {
+      detailedMsg = `Gmail Rejected Password (535 Bad Credentials). Please ensure 2FA is active & 16-character App Password is used. Password length: ${sanitizedPasswordLength}.`;
+    }
     return res.json({
       connected: false,
-      authStatus: `Authentication / Network Failed: ${error.message || 'Unknown Error'}`,
+      authStatus: `SMTP Connection / Auth Failed: ${detailedMsg}`,
       gmailUser: user,
       notificationEmail: notificationEmail,
       envLoaded,
-      lastError: error.message || String(error),
+      missingVars,
+      sanitizedPasswordLength,
+      hasSpacesInPassword,
+      platform: process.env.VERCEL ? 'Vercel Serverless' : 'Express / Container',
+      lastError: detailedMsg,
       totalLogs: emailLogs.length,
     });
   }

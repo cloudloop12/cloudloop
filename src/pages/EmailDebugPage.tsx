@@ -16,6 +16,10 @@ interface SMTPStatus {
     GMAIL_APP_PASSWORD: boolean;
     NOTIFICATION_EMAIL: boolean;
   };
+  missingVars?: string[];
+  sanitizedPasswordLength?: number;
+  hasSpacesInPassword?: boolean;
+  platform?: string;
   lastError: string | null;
   totalLogs: number;
 }
@@ -183,7 +187,9 @@ export const EmailDebugPage: React.FC = () => {
           <div className="p-6 rounded-3xl bg-slate-900/80 [data-theme=light]:bg-white [data-theme=eyecare]:bg-[#fbf8f3] border border-slate-800 [data-theme=light]:border-slate-200 [data-theme=eyecare]:border-[#ded6cc] shadow-xl space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Environment Variables</span>
-              <Lock className="w-4 h-4 text-cyan-400" />
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-500/30">
+                {status?.platform || 'Vercel Serverless'}
+              </span>
             </div>
 
             <div className="space-y-3">
@@ -194,21 +200,28 @@ export const EmailDebugPage: React.FC = () => {
                     <CheckCircle2 className="w-3.5 h-3.5" /> Loaded
                   </span>
                 ) : (
-                  <span className="text-[11px] font-bold text-amber-400 flex items-center gap-1">
-                    <AlertTriangle className="w-3.5 h-3.5" /> Fallback
+                  <span className="text-[11px] font-bold text-rose-400 flex items-center gap-1">
+                    <XCircle className="w-3.5 h-3.5" /> Missing in Env
                   </span>
                 )}
               </div>
 
               <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-950/50 [data-theme=light]:bg-slate-50 [data-theme=eyecare]:bg-[#eae4db]/50 border border-slate-800/60 [data-theme=light]:border-slate-200 [data-theme=eyecare]:border-[#ded6cc]">
-                <div className="text-xs font-mono">GMAIL_APP_PASSWORD</div>
+                <div>
+                  <div className="text-xs font-mono">GMAIL_APP_PASSWORD</div>
+                  {status?.sanitizedPasswordLength ? (
+                    <div className="text-[10px] text-slate-400">
+                      {status.sanitizedPasswordLength} chars {status.hasSpacesInPassword ? '(Spaces sanitized)' : ''}
+                    </div>
+                  ) : null}
+                </div>
                 {status?.envLoaded.GMAIL_APP_PASSWORD ? (
                   <span className="text-[11px] font-bold text-emerald-400 flex items-center gap-1">
                     <CheckCircle2 className="w-3.5 h-3.5" /> Configured
                   </span>
                 ) : (
                   <span className="text-[11px] font-bold text-rose-400 flex items-center gap-1">
-                    <XCircle className="w-3.5 h-3.5" /> Missing
+                    <XCircle className="w-3.5 h-3.5" /> Missing in Env
                   </span>
                 )}
               </div>
@@ -220,8 +233,8 @@ export const EmailDebugPage: React.FC = () => {
                     <CheckCircle2 className="w-3.5 h-3.5" /> Configured
                   </span>
                 ) : (
-                  <span className="text-[11px] font-bold text-amber-400 flex items-center gap-1">
-                    <AlertTriangle className="w-3.5 h-3.5" /> Fallback
+                  <span className="text-[11px] font-bold text-rose-400 flex items-center gap-1">
+                    <XCircle className="w-3.5 h-3.5" /> Missing in Env
                   </span>
                 )}
               </div>
