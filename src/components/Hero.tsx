@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { ArrowRight, Building2, Laptop, ShieldCheck, Sparkles, CheckCircle2, Award } from 'lucide-react';
 import { DivisionType } from '../types';
+import { Magnetic } from './Magnetic';
 
 interface HeroProps {
   onSelectDivisionFilter?: (division: DivisionType) => void;
@@ -123,38 +124,42 @@ export const Hero: React.FC<HeroProps> = ({
               className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-2"
             >
               {/* Division 1 Button */}
-              <button
-                onClick={() => handleDivisionClick('documents')}
-                className="group relative inline-flex items-center justify-between px-6 py-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-blue-600/30 hover:-translate-y-0.5 transition-all cursor-pointer"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-white/10 text-white">
-                    <Building2 className="w-5 h-5" />
+              <Magnetic strength={10}>
+                <button
+                  onClick={() => handleDivisionClick('documents')}
+                  className="group relative inline-flex items-center justify-between px-6 py-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-blue-600/30 hover:-translate-y-0.5 transition-all cursor-pointer"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-white/10 text-white">
+                      <Building2 className="w-5 h-5" />
+                    </div>
+                    <div className="text-left">
+                      <span className="block text-[10px] font-bold text-blue-200 uppercase tracking-widest">Division 01</span>
+                      <span className="block text-sm font-extrabold">Documents Clearing</span>
+                    </div>
                   </div>
-                  <div className="text-left">
-                    <span className="block text-[10px] font-bold text-blue-200 uppercase tracking-widest">Division 01</span>
-                    <span className="block text-sm font-extrabold">Documents Clearing</span>
-                  </div>
-                </div>
-                <ArrowRight className="w-4 h-4 ml-3 group-hover:translate-x-1 transition-transform" />
-              </button>
+                  <ArrowRight className="w-4 h-4 ml-3 group-hover:translate-x-1 transition-transform" />
+                </button>
+              </Magnetic>
 
               {/* Division 2 Button */}
-              <button
-                onClick={() => handleDivisionClick('it')}
-                className="group relative inline-flex items-center justify-between px-6 py-4 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-white font-bold text-xs uppercase tracking-wider shadow-lg hover:-translate-y-0.5 transition-all cursor-pointer"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-blue-500/20 text-blue-400">
-                    <Laptop className="w-5 h-5" />
+              <Magnetic strength={10}>
+                <button
+                  onClick={() => handleDivisionClick('it')}
+                  className="group relative inline-flex items-center justify-between px-6 py-4 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-white font-bold text-xs uppercase tracking-wider shadow-lg hover:-translate-y-0.5 transition-all cursor-pointer"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-blue-500/20 text-blue-400">
+                      <Laptop className="w-5 h-5" />
+                    </div>
+                    <div className="text-left">
+                      <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest">Division 02</span>
+                      <span className="block text-sm font-extrabold text-slate-100">Information Tech</span>
+                    </div>
                   </div>
-                  <div className="text-left">
-                    <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest">Division 02</span>
-                    <span className="block text-sm font-extrabold text-slate-100">Information Tech</span>
-                  </div>
-                </div>
-                <ArrowRight className="w-4 h-4 ml-3 text-blue-400 group-hover:translate-x-1 transition-transform" />
-              </button>
+                  <ArrowRight className="w-4 h-4 ml-3 text-blue-400 group-hover:translate-x-1 transition-transform" />
+                </button>
+              </Magnetic>
             </motion.div>
 
             {/* Quick Feature Badges */}

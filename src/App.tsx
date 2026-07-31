@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
+import { CustomCursor } from './components/CustomCursor';
 import { Preloader } from './components/Preloader';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
@@ -67,6 +68,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-950 [data-theme=light]:bg-[#f8fafc] [data-theme=eyecare]:bg-[#f4f0ea] text-slate-100 [data-theme=light]:text-slate-900 [data-theme=eyecare]:text-[#2c2724] font-sans transition-colors duration-300 selection:bg-cyan-500 selection:text-slate-950">
+      <CustomCursor />
       <Preloader />
       <ScrollToTopOnNavigate />
 

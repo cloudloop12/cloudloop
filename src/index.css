@@ -156,6 +156,39 @@ body {
   .animate-pulse-glow {
     animation: pulseGlow 3s infinite ease-in-out;
   }
+
+  /* Custom Cursor Rules */
+  html.has-custom-cursor,
+  html.has-custom-cursor body,
+  html.has-custom-cursor button,
+  html.has-custom-cursor a,
+  html.has-custom-cursor [role="button"],
+  html.has-custom-cursor .shiny-card {
+    cursor: none !important;
+  }
+
+  html.has-custom-cursor input,
+  html.has-custom-cursor textarea,
+  html.has-custom-cursor select,
+  html.has-custom-cursor [contenteditable="true"],
+  html.has-custom-cursor .no-custom-cursor {
+    cursor: text !important;
+  }
+
+  @keyframes pulseSubtle {
+    0%, 100% {
+      transform: scale(1.8);
+      box-shadow: 0 0 15px rgba(34, 211, 238, 0.3);
+    }
+    50% {
+      transform: scale(2.0);
+      box-shadow: 0 0 25px rgba(34, 211, 238, 0.5);
+    }
+  }
+
+  .animate-pulse-subtle {
+    animation: pulseSubtle 2s infinite ease-in-out;
+  }
 }
 
 /* ------------------------------------------------------------- */
