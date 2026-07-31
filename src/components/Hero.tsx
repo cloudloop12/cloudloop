@@ -4,11 +4,16 @@ import { ArrowRight, Building2, Laptop, ShieldCheck, Sparkles, CheckCircle2, Awa
 import { DivisionType } from '../types';
 
 interface HeroProps {
-  onSelectDivision: (division: DivisionType) => void;
+  onSelectDivisionFilter?: (division: DivisionType) => void;
+  onSelectDivision?: (division: DivisionType) => void;
   onOpenConsultation: (preselectedService?: string) => void;
 }
 
-export const Hero: React.FC<HeroProps> = ({ onSelectDivision, onOpenConsultation }) => {
+export const Hero: React.FC<HeroProps> = ({
+  onSelectDivisionFilter,
+  onSelectDivision,
+  onOpenConsultation,
+}) => {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -17,6 +22,19 @@ export const Hero: React.FC<HeroProps> = ({ onSelectDivision, onOpenConsultation
       x: e.clientX - rect.left,
       y: e.clientY - rect.top,
     });
+  };
+
+  const handleDivisionClick = (division: DivisionType) => {
+    if (onSelectDivisionFilter) {
+      onSelectDivisionFilter(division);
+    } else if (onSelectDivision) {
+      onSelectDivision(division);
+    }
+
+    const el = document.getElementById('services') || document.getElementById('divisions');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   return (
@@ -106,12 +124,8 @@ export const Hero: React.FC<HeroProps> = ({ onSelectDivision, onOpenConsultation
             >
               {/* Division 1 Button */}
               <button
-                onClick={() => {
-                  onSelectDivision('documents');
-                  const el = document.getElementById('services');
-                  el?.scrollIntoView({ behavior: 'smooth' });
-                }}
-                className="group relative inline-flex items-center justify-between px-6 py-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-blue-600/30 hover:-translate-y-0.5 transition-all"
+                onClick={() => handleDivisionClick('documents')}
+                className="group relative inline-flex items-center justify-between px-6 py-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-blue-600/30 hover:-translate-y-0.5 transition-all cursor-pointer"
               >
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-lg bg-white/10 text-white">
@@ -127,12 +141,8 @@ export const Hero: React.FC<HeroProps> = ({ onSelectDivision, onOpenConsultation
 
               {/* Division 2 Button */}
               <button
-                onClick={() => {
-                  onSelectDivision('it');
-                  const el = document.getElementById('services');
-                  el?.scrollIntoView({ behavior: 'smooth' });
-                }}
-                className="group relative inline-flex items-center justify-between px-6 py-4 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-white font-bold text-xs uppercase tracking-wider shadow-lg hover:-translate-y-0.5 transition-all"
+                onClick={() => handleDivisionClick('it')}
+                className="group relative inline-flex items-center justify-between px-6 py-4 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-white font-bold text-xs uppercase tracking-wider shadow-lg hover:-translate-y-0.5 transition-all cursor-pointer"
               >
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-lg bg-blue-500/20 text-blue-400">
@@ -201,7 +211,7 @@ export const Hero: React.FC<HeroProps> = ({ onSelectDivision, onOpenConsultation
                 
                 {/* Division 1 Block */}
                 <div
-                  onClick={() => onSelectDivision('documents')}
+                  onClick={() => handleDivisionClick('documents')}
                   className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 hover:border-blue-500/50 cursor-pointer transition-all group"
                 >
                   <div className="flex items-start justify-between">
@@ -229,7 +239,7 @@ export const Hero: React.FC<HeroProps> = ({ onSelectDivision, onOpenConsultation
 
                 {/* Division 2 Block */}
                 <div
-                  onClick={() => onSelectDivision('it')}
+                  onClick={() => handleDivisionClick('it')}
                   className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 hover:border-cyan-500/50 cursor-pointer transition-all group"
                 >
                   <div className="flex items-start justify-between">

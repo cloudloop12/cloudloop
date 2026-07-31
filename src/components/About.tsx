@@ -1,8 +1,11 @@
 import React from 'react';
-import { motion } from 'motion/react';
 import { Shield, Target, Eye, Compass, Award, Building2, Laptop, CheckCircle } from 'lucide-react';
 
-export const About: React.FC = () => {
+interface AboutProps {
+  onOpenConsultation?: (preselectedService?: string) => void;
+}
+
+export const About: React.FC<AboutProps> = ({ onOpenConsultation }) => {
   const coreValues = [
     {
       title: 'Integrity & Compliance',
@@ -28,7 +31,7 @@ export const About: React.FC = () => {
 
   return (
     <section id="about" className="py-24 bg-slate-950 text-white relative overflow-hidden">
-      {/* Background Accent Lines */}
+      {/* Background Accent Lines & Glow */}
       <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-b from-blue-900/10 to-transparent pointer-events-none"></div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -50,13 +53,13 @@ export const About: React.FC = () => {
         {/* Corporate Story & Dual Division Synergy Grid */}
         <div className="mt-16 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
-          {/* Visual Showcase Box */}
+          {/* Visual Showcase Banner Box */}
           <div className="lg:col-span-6 relative">
-            <div className="relative rounded-3xl overflow-hidden border border-slate-800 shadow-2xl shadow-cyan-950/30">
+            <div className="relative rounded-3xl overflow-hidden border border-slate-800 shadow-2xl shadow-cyan-950/30 group">
               <img
-                src="/src/assets/images/documents_clearing_thumb_1785305602365.jpg"
-                alt="Cloudloop Group Dubai Executive Boardroom"
-                className="w-full h-[420px] object-cover filter brightness-95 contrast-105"
+                src="/cloudloop.webp"
+                alt="Cloudloop Group UAE Corporate Operations"
+                className="w-full h-auto min-h-[300px] sm:min-h-[380px] lg:h-[430px] object-cover object-center filter brightness-95 contrast-105 group-hover:scale-105 transition-transform duration-700"
                 referrerPolicy="no-referrer"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent"></div>
@@ -64,7 +67,7 @@ export const About: React.FC = () => {
               {/* Floating Badge Overlay */}
               <div className="absolute bottom-6 left-6 right-6 p-5 rounded-2xl bg-slate-900/90 border border-slate-700/80 backdrop-blur-md">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center text-white shrink-0 font-extrabold text-xl">
+                  <div className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center text-white shrink-0 font-extrabold text-xl shadow-lg shadow-blue-600/30">
                     C
                   </div>
                   <div>
