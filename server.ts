@@ -1,5 +1,6 @@
 import express from 'express';
 import path from 'path';
+import fs from 'fs';
 import dotenv from 'dotenv';
 import nodemailer from 'nodemailer';
 
@@ -47,6 +48,9 @@ export interface EmailLogEntry {
 }
 
 // In-Memory Email Activity Logs Store
+import { generateInvoicePDF, InvoiceData, ServiceItem, formatAED } from './server/pdfGenerator.js';
+import { generateAdminOrderEmailHTML, generateCustomerConfirmationEmailHTML } from './server/emailTemplates.js';
+
 const emailLogs: EmailLogEntry[] = [];
 
 function addEmailLog(entry: Omit<EmailLogEntry, 'id' | 'timestamp'>) {
@@ -89,135 +93,68 @@ export function getTransporter() {
   });
 }
 
-// -------------------------------------------------------------
-// HTML Email Template Generators
-// -------------------------------------------------------------
-
-function generateAdminEmailHTML(type: string, data: Record<string, any>) {
-  const formattedFields = Object.entries(data)
-    .map(
-      ([key, val]) => `
-      <tr>
-        <td style="padding: 10px 14px; background: #0f172a; color: #94a3b8; font-weight: 600; font-size: 13px; text-transform: uppercase; border-bottom: 1px solid #1e293b; width: 35%;">${key.replace(/_/g, ' ')}</td>
-        <td style="padding: 10px 14px; background: #0b1120; color: #f8fafc; font-size: 14px; border-bottom: 1px solid #1e293b;">${val || 'N/A'}</td>
-      </tr>
-    `
-    )
-    .join('');
-
-  return `
-  <!DOCTYPE html>
-  <html>
-  <head>
-    <meta charset="utf-8">
-    <title>New Inquiry Alert - ${type}</title>
-  </head>
-  <body style="margin: 0; padding: 0; background-color: #020617; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #f8fafc;">
-    <table width="100%" cellpadding="0" cellspacing="0" style="padding: 40px 20px;">
-      <tr>
-        <td align="center">
-          <table width="600" cellpadding="0" cellspacing="0" style="background-color: #0b1120; border: 1px solid #1e293b; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.5);">
-            <!-- Header -->
-            <tr>
-              <td style="background: linear-gradient(135deg, #090d16 0%, #0f172a 100%); padding: 30px; text-align: center; border-bottom: 2px solid #0284c7;">
-                <h1 style="margin: 0; color: #38bdf8; font-size: 24px; font-weight: 800; letter-spacing: 1px;">CLOUDLOOP GROUP</h1>
-                <p style="margin: 6px 0 0 0; color: #94a3b8; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px;">Admin Event Notification System</p>
-              </td>
-            </tr>
-            <!-- Content -->
-            <tr>
-              <td style="padding: 32px;">
-                <div style="margin-bottom: 24px;">
-                  <span style="display: inline-block; padding: 6px 14px; background: rgba(2, 132, 199, 0.2); border: 1px solid #0284c7; color: #38bdf8; font-size: 12px; font-weight: 700; border-radius: 20px; text-transform: uppercase;">
-                    ⚡ ${type}
-                  </span>
-                </div>
-                <h2 style="margin: 0 0 16px 0; color: #ffffff; font-size: 18px;">Submission Details</h2>
-                <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse; border-radius: 8px; overflow: hidden; margin-bottom: 24px;">
-                  ${formattedFields}
-                </table>
-                <p style="margin: 0; font-size: 12px; color: #64748b; text-align: right;">Received on: ${new Date().toLocaleString('en-US', { timeZone: 'Asia/Dubai' })} GST (Dubai)</p>
-              </td>
-            </tr>
-            <!-- Footer -->
-            <tr>
-              <td style="padding: 20px; background-color: #090d16; border-top: 1px solid #1e293b; text-align: center; font-size: 12px; color: #64748b;">
-                Cloudloop Group LLC • Level 18, Business Bay Tower, Sheikh Zayed Road, Dubai, UAE
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
-  </body>
-  </html>
-  `;
+function getServicePriceEstimate(serviceName: string): number {
+  const name = (serviceName || '').toLowerCase();
+  if (name.includes('setup') || name.includes('free zone') || name.includes('mainland')) return 12500;
+  if (name.includes('tax') || name.includes('vat') || name.includes('accounting')) return 3500;
+  if (name.includes('pro') || name.includes('visa')) return 2200;
+  if (name.includes('cloud') || name.includes('infrastructure')) return 8500;
+  if (name.includes('software') || name.includes('app') || name.includes('web')) return 15000;
+  if (name.includes('seo') || name.includes('marketing')) return 4500;
+  if (name.includes('consultation') || name.includes('advisory')) return 1500;
+  return 2500;
 }
 
-function generateCustomerConfirmationHTML(name: string, type: string) {
-  return `
-  <!DOCTYPE html>
-  <html>
-  <head>
-    <meta charset="utf-8">
-    <title>Thank You for Contacting Cloudloop Group UAE</title>
-  </head>
-  <body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #0f172a;">
-    <table width="100%" cellpadding="0" cellspacing="0" style="padding: 40px 20px;">
-      <tr>
-        <td align="center">
-          <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.06);">
-            <!-- Header -->
-            <tr>
-              <td style="background-color: #020617; padding: 36px 30px; text-align: center;">
-                <h1 style="margin: 0; color: #ffffff; font-size: 26px; font-weight: 800; letter-spacing: 1px;">CLOUDLOOP <span style="color: #38bdf8;">GROUP</span></h1>
-                <p style="margin: 8px 0 0 0; color: #94a3b8; font-size: 13px; font-weight: 500;">Documents Clearing & Information Technology Division</p>
-              </td>
-            </tr>
-            <!-- Content -->
-            <tr>
-              <td style="padding: 40px 32px;">
-                <h2 style="margin: 0 0 16px 0; color: #020617; font-size: 20px;">Dear ${name || 'Valued Client'},</h2>
-                <p style="margin: 0 0 20px 0; font-size: 15px; line-height: 1.6; color: #334155;">
-                  Thank you for submitting your <strong>${type}</strong> request with Cloudloop Group UAE. We have successfully logged your inquiry and assigned an executive senior consultant to your case.
-                </p>
+function buildInvoiceDataFromSubmission(data: any, type: string): InvoiceData {
+  const invoiceNumber = `INV-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`;
+  const dateStr = new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
+  const dueDateObj = new Date();
+  dueDateObj.setDate(dueDateObj.getDate() + 30);
+  const dueDateStr = dueDateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
 
-                <div style="background-color: #f0f9ff; border-left: 4px solid #0284c7; padding: 20px; border-radius: 8px; margin-bottom: 28px;">
-                  <h3 style="margin: 0 0 8px 0; color: #0369a1; font-size: 15px; font-weight: 700;">What Happens Next?</h3>
-                  <ul style="margin: 0; padding-left: 20px; color: #0c4a6e; font-size: 14px; line-height: 1.6;">
-                    <li>Our specialized team will review your requirements within <strong>2 business hours</strong>.</li>
-                    <li>A dedicated account manager will contact you via email or phone (+971).</li>
-                    <li>For urgent processing, feel free to contact our direct WhatsApp desk below.</li>
-                  </ul>
-                </div>
+  let items: ServiceItem[] = [];
 
-                <div style="text-align: center; margin-bottom: 30px;">
-                  <a href="https://wa.me/971556126050?text=Hello%20Cloudloop%20Group,%20I%20have%20submitted%20a%20request" style="display: inline-block; padding: 14px 28px; background-color: #25d366; color: #ffffff; font-weight: 700; font-size: 14px; text-decoration: none; border-radius: 10px; box-shadow: 0 4px 12px rgba(37,211,102,0.3);">
-                    💬 Connect Instantly via WhatsApp (+971 55 612 6050)
-                  </a>
-                </div>
+  if (Array.isArray(data.items) && data.items.length > 0) {
+    items = data.items.map((i: any) => ({
+      name: i.name || i.service || 'Cloudloop Professional Service',
+      quantity: Number(i.quantity) || 1,
+      unitPrice: Number(i.unitPrice) || Number(i.price) || 1500,
+      total: (Number(i.quantity) || 1) * (Number(i.unitPrice) || Number(i.price) || 1500),
+    }));
+  } else if (Array.isArray(data.services) && data.services.length > 0) {
+    items = data.services.map((srv: string) => {
+      const price = getServicePriceEstimate(srv);
+      return { name: srv, quantity: 1, unitPrice: price, total: price };
+    });
+  } else {
+    const srvName = data.serviceNeeded || data.service || data.position || `${type} Consultation & Processing`;
+    const qty = Number(data.quantity) || 1;
+    const unitPrice = Number(data.unitPrice) || getServicePriceEstimate(srvName);
+    items = [{ name: srvName, quantity: qty, unitPrice, total: qty * unitPrice }];
+  }
 
-                <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #64748b;">
-                  Best regards,<br>
-                  <strong style="color: #0f172a;">Executive Relations Team</strong><br>
-                  Cloudloop Group LLC | Dubai, UAE
-                </p>
-              </td>
-            </tr>
-            <!-- Footer -->
-            <tr>
-              <td style="padding: 24px; background-color: #f8fafc; border-top: 1px solid #e2e8f0; text-align: center; font-size: 12px; color: #64748b; line-height: 1.6;">
-                Cloudloop Group LLC • Business Bay Tower, Sheikh Zayed Road, Dubai, UAE<br>
-                Phone: +971-55-612-6050 | Email: info@cloudloopgroup.com | Website: cloudloopgroup.com
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
-  </body>
-  </html>
-  `;
+  const subtotal = items.reduce((acc, curr) => acc + curr.total, 0);
+  const vat = Math.round(subtotal * 0.05 * 100) / 100;
+  const discount = Number(data.discount) || 0;
+  const grandTotal = subtotal + vat - discount;
+
+  return {
+    invoiceNumber,
+    date: dateStr,
+    dueDate: dueDateStr,
+    customerName: data.name || data.fullName || 'Valued Client',
+    companyName: data.companyName || data.company || '',
+    email: data.email || 'client@cloudloop.ae',
+    phone: data.phone || data.mobile || '',
+    country: data.country || 'United Arab Emirates',
+    notes: data.message || data.details || data.notes || '',
+    serviceType: type,
+    items,
+    subtotal,
+    vat,
+    discount,
+    grandTotal,
+  };
 }
 
 // -------------------------------------------------------------
@@ -379,40 +316,64 @@ app.post(['/api/email/test-send', '/email/test-send'], async (req, res) => {
   }
 
   try {
+    const sampleInvoiceData = buildInvoiceDataFromSubmission(
+      {
+        name: 'Enterprise Diagnostic Client',
+        companyName: 'Cloudloop Global Systems FZ-LLC',
+        email: targetEmail,
+        phone: '+971 50 123 4567',
+        country: 'United Arab Emirates',
+        message: 'Enterprise SMTP & PDF Invoice Integration Automated Test.',
+        services: ['Free Zone & Mainland Business Setup', 'Corporate Tax & VAT Filing'],
+      },
+      'Enterprise Service Order Test'
+    );
+
+    const logoPath = path.join(process.cwd(), 'public', 'logo.png');
+    const hasLogo = fs.existsSync(logoPath);
+    const pdfBuffer = await generateInvoicePDF(sampleInvoiceData);
+
+    const attachments: any[] = [];
+    if (hasLogo) {
+      attachments.push({
+        filename: 'logo.png',
+        path: logoPath,
+        cid: 'cloudloop-logo',
+      });
+    }
+
+    attachments.push({
+      filename: `Cloudloop_Invoice_${sampleInvoiceData.invoiceNumber}.pdf`,
+      content: pdfBuffer,
+      contentType: 'application/pdf',
+    });
+
     const info = await transporter.sendMail({
-      from: `"Cloudloop Group Diagnostic" <${process.env.GMAIL_USER || 'mailtocloudloop@gmail.com'}>`,
+      from: `"Cloudloop Group UAE" <${process.env.GMAIL_USER || 'mailtocloudloop@gmail.com'}>`,
       to: targetEmail,
-      subject: `[SMTP Test] Cloudloop Email System Diagnostic - ${new Date().toLocaleTimeString()}`,
-      html: `
-        <div style="font-family: sans-serif; padding: 20px; background-color: #0f172a; color: #f8fafc; border-radius: 12px;">
-          <h2 style="color: #38bdf8;">✅ Cloudloop SMTP Integration Verified</h2>
-          <p>This test email confirms that Gmail SMTP authentication is functioning correctly on your server.</p>
-          <ul>
-            <li><strong>Timestamp:</strong> ${new Date().toISOString()}</li>
-            <li><strong>Sender:</strong> ${process.env.GMAIL_USER || 'mailtocloudloop@gmail.com'}</li>
-            <li><strong>Recipient:</strong> ${targetEmail}</li>
-          </ul>
-        </div>
-      `,
+      subject: `[Cloudloop Test Invoice] Service Order Confirmation #${sampleInvoiceData.invoiceNumber}`,
+      html: generateCustomerConfirmationEmailHTML(sampleInvoiceData, 'Enterprise Service Test'),
+      attachments,
     });
 
     addEmailLog({
-      type: 'SMTP Diagnostic Test',
+      type: 'Enterprise SMTP Test & PDF Dispatch',
       recipient: targetEmail,
-      subject: 'Test Email Diagnostic Attempt',
+      subject: `Service Order Confirmation #${sampleInvoiceData.invoiceNumber}`,
       status: 'success',
-      details: { messageId: info.messageId, response: info.response },
+      details: { messageId: info.messageId, invoiceNumber: sampleInvoiceData.invoiceNumber, pdfAttached: true },
     });
 
     return res.json({
       success: true,
-      message: `Test email dispatched successfully to ${targetEmail}`,
+      message: `Test enterprise confirmation email with PDF invoice dispatched successfully to ${targetEmail}`,
       messageId: info.messageId,
+      invoiceNumber: sampleInvoiceData.invoiceNumber,
     });
   } catch (error: any) {
     const errorMsg = error.message || String(error);
     addEmailLog({
-      type: 'SMTP Diagnostic Test',
+      type: 'Enterprise SMTP Test & PDF Dispatch',
       recipient: targetEmail,
       subject: 'Test Email Diagnostic Attempt',
       status: 'failed',
@@ -435,6 +396,36 @@ async function handleSubmission(req: express.Request, res: express.Response, typ
   const adminTarget = process.env.NOTIFICATION_EMAIL || process.env.GMAIL_USER || 'mailtocloudloop@gmail.com';
   const clientEmail = data.email;
 
+  const invoiceData = buildInvoiceDataFromSubmission(data, type);
+
+  let pdfBuffer: Buffer | null = null;
+  try {
+    pdfBuffer = await generateInvoicePDF(invoiceData);
+  } catch (pdfErr) {
+    console.error('[PDF Generation Error]:', pdfErr);
+  }
+
+  const logoPath = path.join(process.cwd(), 'public', 'logo.png');
+  const hasLogo = fs.existsSync(logoPath);
+
+  const commonAttachments: any[] = [];
+  if (hasLogo) {
+    commonAttachments.push({
+      filename: 'logo.png',
+      path: logoPath,
+      cid: 'cloudloop-logo',
+    });
+  }
+
+  const customerAttachments = [...commonAttachments];
+  if (pdfBuffer) {
+    customerAttachments.push({
+      filename: `Cloudloop_Invoice_${invoiceData.invoiceNumber}.pdf`,
+      content: pdfBuffer,
+      contentType: 'application/pdf',
+    });
+  }
+
   let adminMailSuccess = false;
   let clientMailSuccess = false;
   let lastErrorMessage = '';
@@ -442,12 +433,13 @@ async function handleSubmission(req: express.Request, res: express.Response, typ
   if (transporter) {
     // 1. Send Admin Email
     try {
-      const adminSubject = `[Cloudloop Lead] New ${type} Submission from ${data.name || data.fullName || data.email}`;
+      const adminSubject = `[Cloudloop Service Order] ${type.toUpperCase()} from ${invoiceData.customerName} (${invoiceData.invoiceNumber})`;
       await transporter.sendMail({
         from: `"Cloudloop Web Desk" <${process.env.GMAIL_USER || 'mailtocloudloop@gmail.com'}>`,
         to: adminTarget,
         subject: adminSubject,
-        html: generateAdminEmailHTML(type, data),
+        html: generateAdminOrderEmailHTML(invoiceData, data, type),
+        attachments: commonAttachments,
       });
       adminMailSuccess = true;
 
@@ -456,7 +448,7 @@ async function handleSubmission(req: express.Request, res: express.Response, typ
         recipient: adminTarget,
         subject: adminSubject,
         status: 'success',
-        details: data,
+        details: { invoiceNumber: invoiceData.invoiceNumber, customer: invoiceData.customerName, total: invoiceData.grandTotal },
       });
     } catch (err: any) {
       lastErrorMessage = `Admin Email Error: ${err.message || String(err)}`;
@@ -475,12 +467,13 @@ async function handleSubmission(req: express.Request, res: express.Response, typ
     // 2. Send Customer Confirmation Email if client email provided
     if (clientEmail) {
       try {
-        const clientSubject = `Confirmation: We received your ${type} request - Cloudloop Group`;
+        const clientSubject = `Confirmation: Service Order #${invoiceData.invoiceNumber} - Cloudloop Group UAE`;
         await transporter.sendMail({
           from: `"Cloudloop Group UAE" <${process.env.GMAIL_USER || 'mailtocloudloop@gmail.com'}>`,
           to: clientEmail,
           subject: clientSubject,
-          html: generateCustomerConfirmationHTML(data.name || data.fullName || 'Valued Client', type),
+          html: generateCustomerConfirmationEmailHTML(invoiceData, type),
+          attachments: customerAttachments,
         });
         clientMailSuccess = true;
 
@@ -489,6 +482,7 @@ async function handleSubmission(req: express.Request, res: express.Response, typ
           recipient: clientEmail,
           subject: clientSubject,
           status: 'success',
+          details: { invoiceNumber: invoiceData.invoiceNumber, pdfAttached: !!pdfBuffer },
         });
       } catch (err: any) {
         const clientError = `Client Confirmation Email Error: ${err.message || String(err)}`;
@@ -518,18 +512,18 @@ async function handleSubmission(req: express.Request, res: express.Response, typ
     });
   }
 
-  // Return appropriate response
   if (adminMailSuccess || clientMailSuccess) {
     return res.status(200).json({
       success: true,
       message: `${type} submitted and emails processed successfully!`,
+      invoiceNumber: invoiceData.invoiceNumber,
       emailStatus: { adminMailSuccess, clientMailSuccess },
     });
   } else {
-    // Return 200 with fallback message or 500 depending on requirement, but log error clearly
     return res.status(200).json({
-      success: true, // keep form flow smooth for user
-      message: `${type} received! Note: Email dispatch recorded status: ${lastErrorMessage || 'Logged'}`,
+      success: true,
+      message: `${type} received! Note: Email dispatch status: ${lastErrorMessage || 'Logged'}`,
+      invoiceNumber: invoiceData.invoiceNumber,
       emailStatus: { adminMailSuccess: false, clientMailSuccess: false, error: lastErrorMessage },
     });
   }
