@@ -23,6 +23,7 @@ import { ContactPage } from './pages/ContactPage';
 import { BlogPage } from './pages/BlogPage';
 import { BlogPostPage } from './pages/BlogPostPage';
 import { CareersPage } from './pages/CareersPage';
+import { EmailDebugPage } from './pages/EmailDebugPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
@@ -152,6 +153,9 @@ export default function App() {
 
             {/* Careers Route */}
             <Route path="/careers" element={<CareersPage />} />
+
+            {/* Email System Debug & Monitoring */}
+            <Route path="/email-debug" element={<EmailDebugPage />} />
 
             {/* 404 Catch All Route */}
             <Route path="*" element={<NotFoundPage />} />

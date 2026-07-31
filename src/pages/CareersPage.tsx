@@ -10,9 +10,26 @@ export const CareersPage: React.FC = () => {
   const [applicantName, setApplicantName] = useState('');
   const [applicantEmail, setApplicantEmail] = useState('');
 
-  const handleApply = (e: React.FormEvent) => {
+  const handleApply = async (e: React.FormEvent) => {
     e.preventDefault();
     setApplied(true);
+
+    try {
+      await fetch('/api/career-apply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: applicantName,
+          email: applicantEmail,
+          jobTitle: selectedJob?.title || 'General Career Inquiry',
+          jobDepartment: selectedJob?.department || 'General',
+          jobLocation: selectedJob?.location || 'Dubai, UAE',
+        }),
+      });
+    } catch (err) {
+      console.error('Career application submission error:', err);
+    }
+
     setTimeout(() => {
       setApplied(false);
       setSelectedJob(null);

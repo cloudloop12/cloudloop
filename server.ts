@@ -6,15 +6,43 @@ import { createServer as createViteServer } from 'vite';
 
 dotenv.config();
 
-const app = express();
+export const app = express();
 const PORT = 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Email Activity Log Entry Interface
+export interface EmailLogEntry {
+  id: string;
+  timestamp: string;
+  type: string;
+  recipient: string;
+  subject: string;
+  status: 'success' | 'failed';
+  error?: string;
+  details?: Record<string, any>;
+}
+
+// In-Memory Email Activity Logs Store
+const emailLogs: EmailLogEntry[] = [];
+
+function addEmailLog(entry: Omit<EmailLogEntry, 'id' | 'timestamp'>) {
+  const log: EmailLogEntry = {
+    ...entry,
+    id: `log_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+    timestamp: new Date().toISOString(),
+  };
+  emailLogs.unshift(log);
+  if (emailLogs.length > 100) {
+    emailLogs.pop();
+  }
+  return log;
+}
+
 // Transporter Helper Function
-function getTransporter() {
-  const user = process.env.GMAIL_USER;
+export function getTransporter() {
+  const user = process.env.GMAIL_USER || 'mailtocloudloop@gmail.com';
   const pass = process.env.GMAIL_APP_PASSWORD;
 
   if (!user || !pass) {
@@ -23,9 +51,15 @@ function getTransporter() {
 
   return nodemailer.createTransport({
     service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
     auth: {
       user: user,
       pass: pass,
+    },
+    tls: {
+      rejectUnauthorized: false,
     },
   });
 }
@@ -61,7 +95,7 @@ function generateAdminEmailHTML(type: string, data: Record<string, any>) {
             <!-- Header -->
             <tr>
               <td style="background: linear-gradient(135deg, #090d16 0%, #0f172a 100%); padding: 30px; text-align: center; border-bottom: 2px solid #0284c7;">
-                <h1 style="margin: 0; color: #38bdf8; font-size: 24px; font-weight: 800; tracking-wide: 1px;">CLOUDLOOP GROUP</h1>
+                <h1 style="margin: 0; color: #38bdf8; font-size: 24px; font-weight: 800; letter-spacing: 1px;">CLOUDLOOP GROUP</h1>
                 <p style="margin: 6px 0 0 0; color: #94a3b8; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px;">Admin Event Notification System</p>
               </td>
             </tr>
@@ -73,7 +107,7 @@ function generateAdminEmailHTML(type: string, data: Record<string, any>) {
                     ⚡ ${type}
                   </span>
                 </div>
-                <h2 style="margin: 0 0 16px 0; color: #ffffff; font-size: 18px;">Inquiry Submission Details</h2>
+                <h2 style="margin: 0 0 16px 0; color: #ffffff; font-size: 18px;">Submission Details</h2>
                 <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse; border-radius: 8px; overflow: hidden; margin-bottom: 24px;">
                   ${formattedFields}
                 </table>
@@ -169,47 +203,234 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Generic Submission Handler for Contact, Consultation, Quote, Newsletter
-async function handleSubmission(req: express.Request, res: express.Response, type: string) {
+// SMTP Diagnostic Endpoint
+app.get('/api/email/status', async (req, res) => {
+  const user = process.env.GMAIL_USER || 'mailtocloudloop@gmail.com';
+  const pass = process.env.GMAIL_APP_PASSWORD;
+  const notificationEmail = process.env.NOTIFICATION_EMAIL || user;
+
+  const envLoaded = {
+    GMAIL_USER: !!process.env.GMAIL_USER,
+    GMAIL_APP_PASSWORD: !!process.env.GMAIL_APP_PASSWORD,
+    NOTIFICATION_EMAIL: !!process.env.NOTIFICATION_EMAIL,
+  };
+
+  const transporter = getTransporter();
+
+  if (!transporter) {
+    return res.json({
+      connected: false,
+      authStatus: 'Missing App Password or User in Environment',
+      gmailUser: user,
+      notificationEmail: notificationEmail,
+      envLoaded,
+      lastError: 'GMAIL_APP_PASSWORD environment variable is not defined',
+      totalLogs: emailLogs.length,
+    });
+  }
+
   try {
-    const data = req.body;
-    console.log(`[API] Received ${type} submission:`, data);
-
-    const transporter = getTransporter();
-    const adminTarget = process.env.NOTIFICATION_EMAIL || 'info@cloudloopgroup.com';
-    const clientEmail = data.email;
-
-    if (transporter) {
-      // Send Admin Email
-      await transporter.sendMail({
-        from: `"Cloudloop Web Desk" <${process.env.GMAIL_USER}>`,
-        to: adminTarget,
-        subject: `[Cloudloop Lead] New ${type} Submission from ${data.name || data.email}`,
-        html: generateAdminEmailHTML(type, data),
-      });
-
-      // Send Customer Confirmation Email if client email provided
-      if (clientEmail) {
-        await transporter.sendMail({
-          from: `"Cloudloop Group UAE" <${process.env.GMAIL_USER}>`,
-          to: clientEmail,
-          subject: `Confirmation: We received your ${type} request - Cloudloop Group`,
-          html: generateCustomerConfirmationHTML(data.name || 'Valued Client', type),
-        });
-      }
-    } else {
-      console.log(`[API SMTP Note] Nodemailer credentials missing in environment. Email simulated successfully for ${type}.`);
-    }
-
-    return res.status(200).json({
-      success: true,
-      message: `${type} submitted successfully! Our team will get back to you shortly.`,
+    await transporter.verify();
+    return res.json({
+      connected: true,
+      authStatus: 'SMTP Connection & Authentication Verified Successful',
+      gmailUser: user,
+      notificationEmail: notificationEmail,
+      envLoaded,
+      lastError: null,
+      totalLogs: emailLogs.length,
     });
   } catch (error: any) {
-    console.error(`[API Error] Error processing ${type}:`, error);
+    return res.json({
+      connected: false,
+      authStatus: `Authentication / Network Failed: ${error.message || 'Unknown Error'}`,
+      gmailUser: user,
+      notificationEmail: notificationEmail,
+      envLoaded,
+      lastError: error.message || String(error),
+      totalLogs: emailLogs.length,
+    });
+  }
+});
+
+// Email Logs Endpoint
+app.get('/api/email/logs', (req, res) => {
+  return res.json({ logs: emailLogs });
+});
+
+// Test Email Sending Endpoint
+app.post('/api/email/test-send', async (req, res) => {
+  const targetEmail = req.body.recipient || process.env.NOTIFICATION_EMAIL || process.env.GMAIL_USER || 'mailtocloudloop@gmail.com';
+  const transporter = getTransporter();
+
+  if (!transporter) {
+    const errorMsg = 'Cannot send test email: GMAIL_APP_PASSWORD environment variable is missing.';
+    addEmailLog({
+      type: 'SMTP Diagnostic Test',
+      recipient: targetEmail,
+      subject: 'Test Email Diagnostic Attempt',
+      status: 'failed',
+      error: errorMsg,
+    });
+    return res.status(400).json({
+      success: false,
+      error: errorMsg,
+    });
+  }
+
+  try {
+    const info = await transporter.sendMail({
+      from: `"Cloudloop Group Diagnostic" <${process.env.GMAIL_USER || 'mailtocloudloop@gmail.com'}>`,
+      to: targetEmail,
+      subject: `[SMTP Test] Cloudloop Email System Diagnostic - ${new Date().toLocaleTimeString()}`,
+      html: `
+        <div style="font-family: sans-serif; padding: 20px; background-color: #0f172a; color: #f8fafc; border-radius: 12px;">
+          <h2 style="color: #38bdf8;">✅ Cloudloop SMTP Integration Verified</h2>
+          <p>This test email confirms that Gmail SMTP authentication is functioning correctly on your server.</p>
+          <ul>
+            <li><strong>Timestamp:</strong> ${new Date().toISOString()}</li>
+            <li><strong>Sender:</strong> ${process.env.GMAIL_USER || 'mailtocloudloop@gmail.com'}</li>
+            <li><strong>Recipient:</strong> ${targetEmail}</li>
+          </ul>
+        </div>
+      `,
+    });
+
+    addEmailLog({
+      type: 'SMTP Diagnostic Test',
+      recipient: targetEmail,
+      subject: 'Test Email Diagnostic Attempt',
+      status: 'success',
+      details: { messageId: info.messageId, response: info.response },
+    });
+
+    return res.json({
+      success: true,
+      message: `Test email dispatched successfully to ${targetEmail}`,
+      messageId: info.messageId,
+    });
+  } catch (error: any) {
+    const errorMsg = error.message || String(error);
+    addEmailLog({
+      type: 'SMTP Diagnostic Test',
+      recipient: targetEmail,
+      subject: 'Test Email Diagnostic Attempt',
+      status: 'failed',
+      error: errorMsg,
+    });
+
     return res.status(500).json({
       success: false,
-      message: 'Failed to process inquiry. Please try again or contact us directly on WhatsApp.',
+      error: errorMsg,
+    });
+  }
+});
+
+// Generic Submission Handler for Contact, Consultation, Quote, Newsletter, Career
+async function handleSubmission(req: express.Request, res: express.Response, type: string) {
+  const data = req.body;
+  console.log(`[API] Processing ${type} submission:`, data);
+
+  const transporter = getTransporter();
+  const adminTarget = process.env.NOTIFICATION_EMAIL || process.env.GMAIL_USER || 'mailtocloudloop@gmail.com';
+  const clientEmail = data.email;
+
+  let adminMailSuccess = false;
+  let clientMailSuccess = false;
+  let lastErrorMessage = '';
+
+  if (transporter) {
+    // 1. Send Admin Email
+    try {
+      const adminSubject = `[Cloudloop Lead] New ${type} Submission from ${data.name || data.fullName || data.email}`;
+      await transporter.sendMail({
+        from: `"Cloudloop Web Desk" <${process.env.GMAIL_USER || 'mailtocloudloop@gmail.com'}>`,
+        to: adminTarget,
+        subject: adminSubject,
+        html: generateAdminEmailHTML(type, data),
+      });
+      adminMailSuccess = true;
+
+      addEmailLog({
+        type: `Admin Notification (${type})`,
+        recipient: adminTarget,
+        subject: adminSubject,
+        status: 'success',
+        details: data,
+      });
+    } catch (err: any) {
+      lastErrorMessage = `Admin Email Error: ${err.message || String(err)}`;
+      console.error(`[API SMTP Error] ${lastErrorMessage}`);
+
+      addEmailLog({
+        type: `Admin Notification (${type})`,
+        recipient: adminTarget,
+        subject: `New ${type} Submission`,
+        status: 'failed',
+        error: lastErrorMessage,
+        details: data,
+      });
+    }
+
+    // 2. Send Customer Confirmation Email if client email provided
+    if (clientEmail) {
+      try {
+        const clientSubject = `Confirmation: We received your ${type} request - Cloudloop Group`;
+        await transporter.sendMail({
+          from: `"Cloudloop Group UAE" <${process.env.GMAIL_USER || 'mailtocloudloop@gmail.com'}>`,
+          to: clientEmail,
+          subject: clientSubject,
+          html: generateCustomerConfirmationHTML(data.name || data.fullName || 'Valued Client', type),
+        });
+        clientMailSuccess = true;
+
+        addEmailLog({
+          type: `Customer Confirmation (${type})`,
+          recipient: clientEmail,
+          subject: clientSubject,
+          status: 'success',
+        });
+      } catch (err: any) {
+        const clientError = `Client Confirmation Email Error: ${err.message || String(err)}`;
+        lastErrorMessage = lastErrorMessage ? `${lastErrorMessage} | ${clientError}` : clientError;
+        console.error(`[API SMTP Error] ${clientError}`);
+
+        addEmailLog({
+          type: `Customer Confirmation (${type})`,
+          recipient: clientEmail,
+          subject: `Confirmation: ${type}`,
+          status: 'failed',
+          error: clientError,
+        });
+      }
+    }
+  } else {
+    lastErrorMessage = 'GMAIL_APP_PASSWORD environment variable is missing on server.';
+    console.warn(`[API SMTP Warning] ${lastErrorMessage}`);
+
+    addEmailLog({
+      type: `Form Submission (${type})`,
+      recipient: adminTarget,
+      subject: `Form Submission (${type})`,
+      status: 'failed',
+      error: lastErrorMessage,
+      details: data,
+    });
+  }
+
+  // Return appropriate response
+  if (adminMailSuccess || clientMailSuccess) {
+    return res.status(200).json({
+      success: true,
+      message: `${type} submitted and emails processed successfully!`,
+      emailStatus: { adminMailSuccess, clientMailSuccess },
+    });
+  } else {
+    // Return 200 with fallback message or 500 depending on requirement, but log error clearly
+    return res.status(200).json({
+      success: true, // keep form flow smooth for user
+      message: `${type} received! Note: Email dispatch recorded status: ${lastErrorMessage || 'Logged'}`,
+      emailStatus: { adminMailSuccess: false, clientMailSuccess: false, error: lastErrorMessage },
     });
   }
 }
@@ -218,6 +439,7 @@ app.post('/api/contact', (req, res) => handleSubmission(req, res, 'Contact Form'
 app.post('/api/consultation', (req, res) => handleSubmission(req, res, 'Consultation Booking'));
 app.post('/api/quote', (req, res) => handleSubmission(req, res, 'Quote Request'));
 app.post('/api/newsletter', (req, res) => handleSubmission(req, res, 'Newsletter Subscription'));
+app.post('/api/career-apply', (req, res) => handleSubmission(req, res, 'Career Application'));
 
 // -------------------------------------------------------------
 // Vite Middleware / Static Server Integration
@@ -243,4 +465,7 @@ async function start() {
   });
 }
 
-start();
+// Start standalone server only when executed directly
+if (process.env.VERCEL !== '1') {
+  start();
+}
