@@ -419,7 +419,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenConsultation }) => {
               </Link>
 
               {/* Consultation CTA Button */}
-              <Magnetic strength={8}>
+              <Magnetic strength={3}>
                 <button
                   onClick={() => onOpenConsultation()}
                   className="ml-1 xl:ml-2 px-4 xl:px-5 py-2.5 bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white rounded-full font-bold text-xs uppercase tracking-wider transition-all duration-200 shadow-lg shadow-blue-500/25 hover:shadow-cyan-500/30 hover:scale-[1.03] active:scale-[0.98] shrink-0 flex items-center gap-1.5 border border-cyan-400/30 whitespace-nowrap cursor-pointer"

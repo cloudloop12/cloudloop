@@ -2,13 +2,13 @@ import React, { useRef, useState, useEffect } from 'react';
 
 interface MagneticProps {
   children: React.ReactElement;
-  strength?: number; // Maximum offset distance in pixels (default 8)
+  strength?: number; // Maximum offset distance in pixels (default 3)
   active?: boolean;
 }
 
 export const Magnetic: React.FC<MagneticProps> = ({
   children,
-  strength = 8,
+  strength = 3,
   active = true,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -33,9 +33,9 @@ export const Magnetic: React.FC<MagneticProps> = ({
       const distanceX = e.clientX - centerX;
       const distanceY = e.clientY - centerY;
 
-      // Calculate relative displacement mapped to max strength
-      const moveX = (distanceX / (rect.width / 2)) * strength;
-      const moveY = (distanceY / (rect.height / 2)) * strength;
+      // Calculate relative displacement mapped strictly to max strength
+      const moveX = Math.max(-strength, Math.min(strength, (distanceX / (rect.width / 2)) * strength));
+      const moveY = Math.max(-strength, Math.min(strength, (distanceY / (rect.height / 2)) * strength));
 
       setPosition({ x: moveX, y: moveY });
     };
@@ -63,7 +63,7 @@ export const Magnetic: React.FC<MagneticProps> = ({
       className="inline-block transition-transform duration-300 ease-out will-change-transform"
       style={{
         transform: `translate3d(${position.x}px, ${position.y}px, 0)`,
-        transition: isHovered ? 'transform 0.15s cubic-bezier(0.25, 1, 0.5, 1)' : 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1)',
+        transition: isHovered ? 'transform 0.1s cubic-bezier(0.2, 0.8, 0.2, 1)' : 'transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)',
       }}
     >
       {children}

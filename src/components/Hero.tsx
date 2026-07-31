@@ -124,7 +124,7 @@ export const Hero: React.FC<HeroProps> = ({
               className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-2"
             >
               {/* Division 1 Button */}
-              <Magnetic strength={10}>
+              <Magnetic strength={3}>
                 <button
                   onClick={() => handleDivisionClick('documents')}
                   className="group relative inline-flex items-center justify-between px-6 py-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-blue-600/30 hover:-translate-y-0.5 transition-all cursor-pointer"
@@ -143,7 +143,7 @@ export const Hero: React.FC<HeroProps> = ({
               </Magnetic>
 
               {/* Division 2 Button */}
-              <Magnetic strength={10}>
+              <Magnetic strength={3}>
                 <button
                   onClick={() => handleDivisionClick('it')}
                   className="group relative inline-flex items-center justify-between px-6 py-4 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-white font-bold text-xs uppercase tracking-wider shadow-lg hover:-translate-y-0.5 transition-all cursor-pointer"

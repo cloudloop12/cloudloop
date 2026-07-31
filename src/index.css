@@ -139,22 +139,8 @@ body {
   }
 
   .shiny-card:hover {
-    transform: translateY(-6px) scale(1.018);
+    transform: translateY(-4px) scale(1.008);
     box-shadow: var(--shadow-card);
-  }
-
-  /* Timeline pulse animation */
-  @keyframes pulseGlow {
-    0%, 100% {
-      box-shadow: 0 0 15px rgba(56, 189, 248, 0.3), 0 0 30px rgba(14, 165, 233, 0.1);
-    }
-    50% {
-      box-shadow: 0 0 25px rgba(56, 189, 248, 0.6), 0 0 50px rgba(14, 165, 233, 0.25);
-    }
-  }
-
-  .animate-pulse-glow {
-    animation: pulseGlow 3s infinite ease-in-out;
   }
 
   /* Custom Cursor Rules */
@@ -173,21 +159,6 @@ body {
   html.has-custom-cursor [contenteditable="true"],
   html.has-custom-cursor .no-custom-cursor {
     cursor: text !important;
-  }
-
-  @keyframes pulseSubtle {
-    0%, 100% {
-      transform: scale(1.8);
-      box-shadow: 0 0 15px rgba(34, 211, 238, 0.3);
-    }
-    50% {
-      transform: scale(2.0);
-      box-shadow: 0 0 25px rgba(34, 211, 238, 0.5);
-    }
-  }
-
-  .animate-pulse-subtle {
-    animation: pulseSubtle 2s infinite ease-in-out;
   }
 }
 
