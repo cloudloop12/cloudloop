@@ -1,0 +1,97 @@
+@import "tailwindcss";
+
+@layer utilities {
+  /* Premium Glossy Light Sweep Effect */
+  .shiny-card {
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s ease;
+  }
+
+  .shiny-card::before {
+    content: '';
+    position: absolute;
+    top: -60%;
+    left: -80%;
+    width: 60%;
+    height: 220%;
+    background: linear-gradient(
+      115deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.03) 25%,
+      rgba(255, 255, 255, 0.18) 50%,
+      rgba(56, 189, 248, 0.35) 60%,
+      rgba(255, 255, 255, 0.05) 75%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    transform: rotate(22deg);
+    pointer-events: none;
+    transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
+    opacity: 0;
+    z-index: 25;
+  }
+
+  .shiny-card:hover::before {
+    transform: translate(360%, 0) rotate(22deg);
+    opacity: 1;
+  }
+
+  .shiny-card:hover {
+    transform: translateY(-6px) scale(1.018);
+    box-shadow: 0 20px 40px -15px rgba(14, 165, 233, 0.2), 0 0 20px rgba(56, 189, 248, 0.12);
+  }
+
+  /* Light Theme Specific Shiny Variant */
+  .shiny-card-light {
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s ease;
+  }
+
+  .shiny-card-light::before {
+    content: '';
+    position: absolute;
+    top: -60%;
+    left: -80%;
+    width: 60%;
+    height: 220%;
+    background: linear-gradient(
+      115deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.3) 30%,
+      rgba(56, 189, 248, 0.25) 50%,
+      rgba(255, 255, 255, 0.4) 65%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    transform: rotate(22deg);
+    pointer-events: none;
+    transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
+    opacity: 0;
+    z-index: 25;
+  }
+
+  .shiny-card-light:hover::before {
+    transform: translate(360%, 0) rotate(22deg);
+    opacity: 1;
+  }
+
+  .shiny-card-light:hover {
+    transform: translateY(-5px) scale(1.015);
+    box-shadow: 0 20px 35px -10px rgba(14, 165, 233, 0.18), 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+
+  /* Timeline pulse animation */
+  @keyframes pulseGlow {
+    0%, 100% {
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.3), 0 0 30px rgba(14, 165, 233, 0.1);
+    }
+    50% {
+      box-shadow: 0 0 25px rgba(56, 189, 248, 0.6), 0 0 50px rgba(14, 165, 233, 0.25);
+    }
+  }
+
+  .animate-pulse-glow {
+    animation: pulseGlow 3s infinite ease-in-out;
+  }
+}
+

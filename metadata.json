@@ -1,0 +1,6 @@
+{
+  "name": "Cloudloop Group",
+  "description": "Corporate Website for Cloudloop Group - UAE Business Solutions & Information Technology",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" width="180" height="180">
+  <defs>
+    <linearGradient id="apple-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0055FF" />
+      <stop offset="50%" stop-color="#0088FF" />
+      <stop offset="100%" stop-color="#00C8FF" />
+    </linearGradient>
+  </defs>
+  <rect width="180" height="180" rx="40" fill="#020617"/>
+  <g transform="translate(10, 30)">
+    <path
+      d="M 62 30 C 62 21, 71 14, 80 14 C 89 14, 98 21, 98 30 C 104 30, 109 35, 109 41 C 109 46, 105 50, 99 50 L 61 50 C 55 50, 51 46, 51 41 C 51 35, 56 30, 62 30 Z"
+      fill="#FFFFFF"
+    />
+    <path
+      d="M 46 72 C 34 72, 26 63, 26 52 C 26 41, 35 32, 47 32 C 60 32, 72 44, 80 52 C 88 44, 100 32, 113 32 C 125 32, 134 41, 134 52 C 134 63, 126 72, 114 72 C 101 72, 89 60, 80 52 C 71 60, 59 72, 46 72 Z"
+      fill="url(#apple-grad)"
+    />
+    <circle cx="47" cy="52" r="10" fill="#020617" />
+    <circle cx="113" cy="52" r="10" fill="#020617" />
+  </g>
+</svg>

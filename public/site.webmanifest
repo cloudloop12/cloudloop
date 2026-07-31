@@ -1,0 +1,21 @@
+{
+  "name": "Cloudloop Group",
+  "short_name": "Cloudloop",
+  "description": "Dubai Corporate Documents Clearing & Enterprise IT Engineering",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#020617",
+  "icons": [
+    {
+      "src": "/fav.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/fav.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
