@@ -6,6 +6,23 @@ import {
 } from 'lucide-react';
 import { SEOHead } from '../components/SEOHead';
 
+interface EnvCheckData {
+  runtime: string;
+  nodeVersion: string;
+  environment: string;
+  vercelEnv: string;
+  vercelRegion: string;
+  timestamp: string;
+  env: {
+    GMAIL_USER: boolean;
+    GMAIL_APP_PASSWORD: boolean;
+    NOTIFICATION_EMAIL: boolean;
+  };
+  missingVars: string[];
+  sanitizedPasswordLength: number;
+  hasSpacesInPassword: boolean;
+}
+
 interface SMTPStatus {
   connected: boolean;
   authStatus: string;
@@ -20,6 +37,14 @@ interface SMTPStatus {
   sanitizedPasswordLength?: number;
   hasSpacesInPassword?: boolean;
   platform?: string;
+  meta?: {
+    runtime: string;
+    nodeVersion: string;
+    environment: string;
+    vercelEnv: string;
+    vercelRegion: string;
+    timestamp: string;
+  };
   lastError: string | null;
   totalLogs: number;
 }
@@ -37,19 +62,27 @@ interface EmailLog {
 
 export const EmailDebugPage: React.FC = () => {
   const [status, setStatus] = useState<SMTPStatus | null>(null);
+  const [envCheck, setEnvCheck] = useState<EnvCheckData | null>(null);
   const [logs, setLogs] = useState<EmailLog[]>([]);
   const [loadingStatus, setLoadingStatus] = useState(true);
+  const [responseTimeMs, setResponseTimeMs] = useState<number | null>(null);
   const [testRecipient, setTestRecipient] = useState('');
   const [testSending, setTestSending] = useState(false);
   const [testResult, setTestResult] = useState<{ success: boolean; message: string; error?: string } | null>(null);
+  const [showRawEnvJson, setShowRawEnvJson] = useState(false);
 
   const fetchDiagnosticData = async () => {
     setLoadingStatus(true);
+    const startTime = performance.now();
     try {
-      const [statusRes, logsRes] = await Promise.all([
+      const [statusRes, logsRes, envRes] = await Promise.all([
         fetch('/api/email/status'),
         fetch('/api/email/logs'),
+        fetch('/api/env-check'),
       ]);
+
+      const endTime = performance.now();
+      setResponseTimeMs(Math.round(endTime - startTime));
 
       let statusData: SMTPStatus;
       const statusContentType = statusRes.headers.get('content-type');
@@ -68,12 +101,18 @@ export const EmailDebugPage: React.FC = () => {
         };
       }
 
+      let envCheckData: EnvCheckData | null = null;
+      if (envRes.ok && envRes.headers.get('content-type')?.includes('application/json')) {
+        envCheckData = await envRes.json();
+      }
+
       let logsData = { logs: [] };
       if (logsRes.ok && logsRes.headers.get('content-type')?.includes('application/json')) {
         logsData = await logsRes.json();
       }
 
       setStatus(statusData);
+      setEnvCheck(envCheckData);
       setLogs(logsData.logs || []);
       if (statusData.notificationEmail && statusData.notificationEmail !== 'N/A' && !testRecipient) {
         setTestRecipient(statusData.notificationEmail);
@@ -173,14 +212,86 @@ export const EmailDebugPage: React.FC = () => {
             </p>
           </div>
 
-          <button
-            onClick={fetchDiagnosticData}
-            disabled={loadingStatus}
-            className="self-start md:self-auto px-4 py-2.5 rounded-xl bg-slate-900 [data-theme=light]:bg-white [data-theme=eyecare]:bg-[#fbf8f3] border border-slate-800 [data-theme=light]:border-slate-300 [data-theme=eyecare]:border-[#ded6cc] hover:border-cyan-500/50 text-xs font-bold flex items-center gap-2 shadow-sm cursor-pointer transition-all"
-          >
-            <RefreshCw className={`w-4 h-4 text-cyan-400 ${loadingStatus ? 'animate-spin' : ''}`} />
-            <span>Refresh Diagnostics</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowRawEnvJson(!showRawEnvJson)}
+              className="px-3.5 py-2.5 rounded-xl bg-slate-900 [data-theme=light]:bg-white border border-slate-800 [data-theme=light]:border-slate-300 text-xs font-semibold text-slate-300 [data-theme=light]:text-slate-700 hover:text-white flex items-center gap-1.5 transition-all cursor-pointer"
+            >
+              <Cpu className="w-4 h-4 text-purple-400" />
+              <span>/api/env-check</span>
+            </button>
+            <button
+              onClick={fetchDiagnosticData}
+              disabled={loadingStatus}
+              className="px-4 py-2.5 rounded-xl bg-slate-900 [data-theme=light]:bg-white [data-theme=eyecare]:bg-[#fbf8f3] border border-slate-800 [data-theme=light]:border-slate-300 [data-theme=eyecare]:border-[#ded6cc] hover:border-cyan-500/50 text-xs font-bold flex items-center gap-2 shadow-sm cursor-pointer transition-all"
+            >
+              <RefreshCw className={`w-4 h-4 text-cyan-400 ${loadingStatus ? 'animate-spin' : ''}`} />
+              <span>Refresh</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Production Runtime & Serverless Diagnostics Bar */}
+        <div className="p-5 rounded-2xl bg-slate-900/90 [data-theme=light]:bg-white border border-slate-800 [data-theme=light]:border-slate-200 shadow-lg space-y-3">
+          <div className="flex items-center justify-between border-b border-slate-800/80 [data-theme=light]:border-slate-100 pb-3">
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-300 [data-theme=light]:text-slate-800">
+              <Server className="w-4 h-4 text-cyan-400" />
+              <span>Vercel Serverless & Production Architecture Audit</span>
+            </div>
+            {responseTimeMs && (
+              <span className="flex items-center gap-1.5 text-[11px] font-mono text-emerald-400 bg-emerald-950/60 p-1.5 px-3 rounded-full border border-emerald-500/30">
+                <Clock className="w-3 h-3" /> API Latency: {responseTimeMs}ms
+              </span>
+            )}
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 text-xs">
+            <div className="p-2.5 rounded-xl bg-slate-950/60 [data-theme=light]:bg-slate-50 border border-slate-800/60 [data-theme=light]:border-slate-200">
+              <span className="block text-[10px] uppercase font-bold text-slate-500">Runtime Engine</span>
+              <span className="font-bold text-cyan-400 truncate block mt-0.5">
+                {envCheck?.runtime || status?.platform || 'Vercel Serverless'}
+              </span>
+            </div>
+
+            <div className="p-2.5 rounded-xl bg-slate-950/60 [data-theme=light]:bg-slate-50 border border-slate-800/60 [data-theme=light]:border-slate-200">
+              <span className="block text-[10px] uppercase font-bold text-slate-500">Node.js Version</span>
+              <span className="font-mono text-slate-200 [data-theme=light]:text-slate-800 truncate block mt-0.5">
+                {envCheck?.nodeVersion || status?.meta?.nodeVersion || 'v22.x'}
+              </span>
+            </div>
+
+            <div className="p-2.5 rounded-xl bg-slate-950/60 [data-theme=light]:bg-slate-50 border border-slate-800/60 [data-theme=light]:border-slate-200">
+              <span className="block text-[10px] uppercase font-bold text-slate-500">Vercel Env</span>
+              <span className="font-bold text-amber-400 truncate block mt-0.5">
+                {envCheck?.vercelEnv || status?.meta?.vercelEnv || 'production'}
+              </span>
+            </div>
+
+            <div className="p-2.5 rounded-xl bg-slate-950/60 [data-theme=light]:bg-slate-50 border border-slate-800/60 [data-theme=light]:border-slate-200">
+              <span className="block text-[10px] uppercase font-bold text-slate-500">Vercel Region</span>
+              <span className="font-mono text-slate-300 [data-theme=light]:text-slate-700 truncate block mt-0.5">
+                {envCheck?.vercelRegion || status?.meta?.vercelRegion || 'iad1'}
+              </span>
+            </div>
+
+            <div className="p-2.5 rounded-xl bg-slate-950/60 [data-theme=light]:bg-slate-50 border border-slate-800/60 [data-theme=light]:border-slate-200 col-span-2">
+              <span className="block text-[10px] uppercase font-bold text-slate-500">API Base Endpoint</span>
+              <span className="font-mono text-[11px] text-cyan-300 [data-theme=light]:text-blue-600 truncate block mt-0.5">
+                {typeof window !== 'undefined' ? `${window.location.origin}/api` : '/api'}
+              </span>
+            </div>
+          </div>
+
+          {showRawEnvJson && (
+            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="pt-2">
+              <div className="p-4 rounded-xl bg-black border border-slate-800 font-mono text-[11px] text-cyan-300 overflow-x-auto space-y-2">
+                <div className="text-slate-400 font-bold border-b border-slate-800 pb-1">
+                  GET /api/env-check Payload Response:
+                </div>
+                <pre>{JSON.stringify(envCheck || { error: 'No response from /api/env-check' }, null, 2)}</pre>
+              </div>
+            </motion.div>
+          )}
         </div>
 
         {/* 1. Status Overview Cards */}

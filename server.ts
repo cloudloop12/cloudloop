@@ -11,6 +11,29 @@ const PORT = 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// URL Normalization Middleware for Vercel Serverless Functions
+app.use((req, res, next) => {
+  // Guarantee JSON Content-Type header for all API calls
+  if (req.url.startsWith('/api') || req.url.startsWith('/env-check') || req.url.startsWith('/email')) {
+    res.setHeader('Content-Type', 'application/json');
+  }
+
+  // Normalize Vercel serverless function entry route prefixes if present
+  if (req.url.startsWith('/api/index.ts')) {
+    req.url = req.url.replace('/api/index.ts', '');
+    if (!req.url.startsWith('/')) req.url = '/' + req.url;
+  } else if (req.url.startsWith('/api/index')) {
+    req.url = req.url.replace('/api/index', '');
+    if (!req.url.startsWith('/')) req.url = '/' + req.url;
+  }
+
+  if (req.url === '' || req.url === '/api/') {
+    req.url = '/api';
+  }
+
+  next();
+});
+
 // Email Activity Log Entry Interface
 export interface EmailLogEntry {
   id: string;
@@ -201,12 +224,46 @@ function generateCustomerConfirmationHTML(name: string, type: string) {
 // API Endpoints
 // -------------------------------------------------------------
 
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+// Health Check Endpoint
+app.get(['/api/health', '/health'], (req, res) => {
+  res.json({
+    status: 'ok',
+    runtime: process.env.VERCEL ? 'Vercel Serverless' : 'Express Standalone Container',
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// Dedicated Environment Variables Diagnostics Endpoint (Phase 2)
+app.get(['/api/env-check', '/env-check'], (req, res) => {
+  const rawUser = process.env.GMAIL_USER;
+  const rawPass = process.env.GMAIL_APP_PASSWORD;
+  const rawNotification = process.env.NOTIFICATION_EMAIL;
+
+  const missingVars: string[] = [];
+  if (!rawUser) missingVars.push('GMAIL_USER');
+  if (!rawPass) missingVars.push('GMAIL_APP_PASSWORD');
+  if (!rawNotification) missingVars.push('NOTIFICATION_EMAIL');
+
+  return res.json({
+    runtime: process.env.VERCEL ? 'Vercel Serverless' : 'Express Standalone Container',
+    nodeVersion: process.version,
+    environment: process.env.VERCEL_ENV || process.env.NODE_ENV || 'production',
+    vercelEnv: process.env.VERCEL_ENV || 'N/A',
+    vercelRegion: process.env.VERCEL_REGION || 'N/A',
+    timestamp: new Date().toISOString(),
+    env: {
+      GMAIL_USER: !!rawUser,
+      GMAIL_APP_PASSWORD: !!rawPass,
+      NOTIFICATION_EMAIL: !!rawNotification,
+    },
+    missingVars,
+    sanitizedPasswordLength: rawPass ? rawPass.replace(/\s+/g, '').length : 0,
+    hasSpacesInPassword: rawPass ? /\s/.test(rawPass) : false,
+  });
 });
 
 // SMTP Diagnostic Endpoint
-app.get('/api/email/status', async (req, res) => {
+app.get(['/api/email/status', '/email/status'], async (req, res) => {
   const rawUser = process.env.GMAIL_USER;
   const rawPass = process.env.GMAIL_APP_PASSWORD;
   const rawNotification = process.env.NOTIFICATION_EMAIL;
@@ -228,6 +285,15 @@ app.get('/api/email/status', async (req, res) => {
   const sanitizedPasswordLength = rawPass ? rawPass.replace(/\s+/g, '').length : 0;
   const hasSpacesInPassword = rawPass ? /\s/.test(rawPass) : false;
 
+  const meta = {
+    runtime: process.env.VERCEL ? 'Vercel Serverless' : 'Express Standalone Container',
+    nodeVersion: process.version,
+    environment: process.env.VERCEL_ENV || process.env.NODE_ENV || 'production',
+    vercelEnv: process.env.VERCEL_ENV || 'N/A',
+    vercelRegion: process.env.VERCEL_REGION || 'N/A',
+    timestamp: new Date().toISOString(),
+  };
+
   const transporter = getTransporter();
 
   if (!transporter) {
@@ -243,6 +309,7 @@ app.get('/api/email/status', async (req, res) => {
       sanitizedPasswordLength,
       hasSpacesInPassword,
       platform: process.env.VERCEL ? 'Vercel Serverless' : 'Express / Container',
+      meta,
       lastError: missingVars.length > 0 ? `Please verify Vercel environment variables: ${missingVars.join(', ')}` : 'GMAIL_APP_PASSWORD is not set',
       totalLogs: emailLogs.length,
     });
@@ -260,6 +327,7 @@ app.get('/api/email/status', async (req, res) => {
       sanitizedPasswordLength,
       hasSpacesInPassword,
       platform: process.env.VERCEL ? 'Vercel Serverless' : 'Express / Container',
+      meta,
       lastError: null,
       totalLogs: emailLogs.length,
     });
@@ -278,6 +346,7 @@ app.get('/api/email/status', async (req, res) => {
       sanitizedPasswordLength,
       hasSpacesInPassword,
       platform: process.env.VERCEL ? 'Vercel Serverless' : 'Express / Container',
+      meta,
       lastError: detailedMsg,
       totalLogs: emailLogs.length,
     });
@@ -285,12 +354,12 @@ app.get('/api/email/status', async (req, res) => {
 });
 
 // Email Logs Endpoint
-app.get('/api/email/logs', (req, res) => {
+app.get(['/api/email/logs', '/email/logs'], (req, res) => {
   return res.json({ logs: emailLogs });
 });
 
 // Test Email Sending Endpoint
-app.post('/api/email/test-send', async (req, res) => {
+app.post(['/api/email/test-send', '/email/test-send'], async (req, res) => {
   const targetEmail = req.body.recipient || process.env.NOTIFICATION_EMAIL || process.env.GMAIL_USER || 'mailtocloudloop@gmail.com';
   const transporter = getTransporter();
 
@@ -466,11 +535,11 @@ async function handleSubmission(req: express.Request, res: express.Response, typ
   }
 }
 
-app.post('/api/contact', (req, res) => handleSubmission(req, res, 'Contact Form'));
-app.post('/api/consultation', (req, res) => handleSubmission(req, res, 'Consultation Booking'));
-app.post('/api/quote', (req, res) => handleSubmission(req, res, 'Quote Request'));
-app.post('/api/newsletter', (req, res) => handleSubmission(req, res, 'Newsletter Subscription'));
-app.post('/api/career-apply', (req, res) => handleSubmission(req, res, 'Career Application'));
+app.post(['/api/contact', '/contact'], (req, res) => handleSubmission(req, res, 'Contact Form'));
+app.post(['/api/consultation', '/consultation'], (req, res) => handleSubmission(req, res, 'Consultation Booking'));
+app.post(['/api/quote', '/quote'], (req, res) => handleSubmission(req, res, 'Quote Request'));
+app.post(['/api/newsletter', '/newsletter'], (req, res) => handleSubmission(req, res, 'Newsletter Subscription'));
+app.post(['/api/career-apply', '/career-apply'], (req, res) => handleSubmission(req, res, 'Career Application'));
 
 // -------------------------------------------------------------
 // Vite Middleware / Static Server Integration & Global Error Handling
