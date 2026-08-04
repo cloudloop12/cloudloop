@@ -2,6 +2,7 @@ import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { DETAILED_SERVICES } from '../data/extendedData';
 import { SEOHead } from '../components/SEOHead';
+import { PriceDisplay } from '../components/PriceDisplay';
 import { Laptop, CheckCircle2, Clock, Cpu, ArrowRight, ShieldCheck, ChevronRight, HelpCircle, Code2 } from 'lucide-react';
 
 interface ITServiceDetailPageProps {
@@ -71,7 +72,7 @@ export const ITServiceDetailPage: React.FC<ITServiceDetailPageProps> = ({ onOpen
             <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
               <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Enterprise IT Package</span>
               <div className="text-2xl font-extrabold text-white">
-                Starting from <span className="text-blue-400">{service.startingPrice}</span>
+                Starting from <PriceDisplay price={service.startingPrice} variant="inline" aedClassName="text-blue-400 font-extrabold" />
               </div>
               <p className="text-xs text-slate-400">Includes dedicated solution architect, source code ownership, and 12-month SLA warranty.</p>
 

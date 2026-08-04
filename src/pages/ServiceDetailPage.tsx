@@ -9,6 +9,7 @@ import {
 import { DETAILED_SERVICES_MAP } from '../data/extendedData';
 import { SEOHead } from '../components/SEOHead';
 import { ServiceInquiryForm } from '../components/ServiceInquiryForm';
+import { PriceDisplay } from '../components/PriceDisplay';
 
 interface ServiceDetailPageProps {
   onOpenConsultation?: (preselectedService?: string) => void;
@@ -154,7 +155,7 @@ export const ServiceDetailPage: React.FC<ServiceDetailPageProps> = ({ onOpenCons
                 <div className="flex items-center justify-between border-b border-slate-800 pb-4 mb-6">
                   <div>
                     <span className="text-xs uppercase tracking-wider text-slate-400 font-semibold block">Official Fee Starting From</span>
-                    <span className="text-3xl font-extrabold text-sky-400">{service.pricingStarting}</span>
+                    <PriceDisplay price={service.pricingStarting} variant="large" />
                   </div>
                   <div className="w-12 h-12 bg-sky-500/10 border border-sky-500/30 rounded-xl flex items-center justify-center text-sky-400">
                     <ShieldCheck className="w-7 h-7" />
@@ -348,7 +349,9 @@ export const ServiceDetailPage: React.FC<ServiceDetailPageProps> = ({ onOpenCons
                   Standard Government Queue
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Standard Processing</h3>
-                <div className="text-3xl font-extrabold text-sky-400 mb-4">{service.pricingStarting}</div>
+                <div className="mb-4">
+                  <PriceDisplay price={service.pricingStarting} variant="large" />
+                </div>
                 <p className="text-xs text-slate-400 mb-6">
                   Turnaround: <strong className="text-white">{service.processingTimes?.standard.time || service.timeline}</strong>
                 </p>
@@ -501,9 +504,7 @@ export const ServiceDetailPage: React.FC<ServiceDetailPageProps> = ({ onOpenCons
                 >
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-2xl">{rel.flag || '📄'}</span>
-                    <span className="text-xs font-bold text-sky-400 bg-sky-500/10 px-2.5 py-1 rounded-md border border-sky-500/20">
-                      {rel.pricingStarting}
-                    </span>
+                    <PriceDisplay price={rel.pricingStarting} variant="inline" aedClassName="text-xs font-bold text-sky-400 bg-sky-500/10 px-2.5 py-1 rounded-md border border-sky-500/20" />
                   </div>
                   <h4 className="text-base font-bold text-white group-hover:text-sky-400 transition-colors mb-2">
                     {rel.title}

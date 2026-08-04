@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { Calculator, Check, Plus, Trash2, ArrowRight, ShieldCheck, Sparkles, Building2, Laptop } from 'lucide-react';
 import { CALCULATOR_OPTIONS } from '../data/companyData';
 import { CalculatorOption } from '../types';
+import { PriceDisplay } from './PriceDisplay';
 
 interface CostCalculatorProps {
   onOpenConsultation: (preselectedService?: string) => void;
@@ -272,7 +273,7 @@ export const CostCalculator: React.FC<CostCalculatorProps> = ({ onOpenConsultati
                 </div>
                 <div className="flex justify-between items-center text-lg font-extrabold text-white pt-3 border-t border-slate-800">
                   <span>Total Estimated Project</span>
-                  <span className="text-cyan-400">AED {totalCalculatedCost.toLocaleString()}</span>
+                  <PriceDisplay price={totalCalculatedCost} variant="stacked" aedClassName="text-cyan-400 text-lg font-extrabold" />
                 </div>
               </div>
 

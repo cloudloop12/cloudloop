@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { SEOHead } from '../components/SEOHead';
+import { PriceDisplay } from '../components/PriceDisplay';
 import { DETAILED_SERVICES } from '../data/extendedData';
 import { Building2, FileCheck, Award, FileText, ShieldCheck, Calculator, Landmark, ArrowRight, CheckCircle2, Phone, Search, ExternalLink, Sparkles } from 'lucide-react';
 
@@ -148,7 +149,7 @@ export const DocumentsClearingPage: React.FC<DocumentsClearingPageProps> = ({ on
               <div className="pt-4 border-t border-slate-800 flex items-center justify-between">
                 <div>
                   <span className="text-[10px] text-slate-500 uppercase block">Starting From</span>
-                  <span className="text-sm font-extrabold text-white">{service.startingPrice}</span>
+                  <PriceDisplay price={service.startingPrice} variant="inline" aedClassName="text-sm font-extrabold text-white" />
                 </div>
 
                 <Link

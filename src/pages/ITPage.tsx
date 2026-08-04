@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { SEOHead } from '../components/SEOHead';
 import { DETAILED_SERVICES } from '../data/extendedData';
+import { PriceDisplay } from '../components/PriceDisplay';
 import { Laptop, Code2, Cpu, ShieldAlert, Cloud, Server, Camera, TrendingUp, ArrowRight, CheckCircle2, Search, Sparkles, Terminal } from 'lucide-react';
 
 interface ITPageProps {
@@ -148,7 +149,7 @@ export const ITPage: React.FC<ITPageProps> = ({ onOpenConsultation }) => {
               <div className="pt-4 border-t border-slate-800 flex items-center justify-between">
                 <div>
                   <span className="text-[10px] text-slate-500 uppercase block">Starting Price</span>
-                  <span className="text-sm font-extrabold text-white">{service.startingPrice}</span>
+                  <PriceDisplay price={service.startingPrice} variant="inline" aedClassName="text-sm font-extrabold text-white" />
                 </div>
 
                 <Link

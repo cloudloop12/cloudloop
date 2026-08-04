@@ -13,6 +13,7 @@ import { DivisionType } from '../types';
 import { Logo } from './Logo';
 import { MobileBottomNav } from './MobileBottomNav';
 import { Magnetic } from './Magnetic';
+import { CountryCurrencySelector } from './CountryCurrencySelector';
 
 interface NavbarProps {
   onOpenConsultation: (preselectedService?: string) => void;
@@ -123,8 +124,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenConsultation }) => {
             </a>
           </div>
 
-          {/* Top Bar Right: Email & Dubai Location */}
-          <div className="flex items-center space-x-6 text-slate-400">
+          {/* Top Bar Right: Country/Currency & Email & Location */}
+          <div className="flex items-center space-x-5 text-slate-400">
+            <CountryCurrencySelector />
+            <span className="text-slate-700">|</span>
             <a 
               href={`mailto:${COMPANY_INFO.email}`} 
               className="flex items-center gap-1.5 hover:text-cyan-400 transition-colors font-medium text-slate-300"
@@ -443,9 +446,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenConsultation }) => {
 
             {/* Mobile Actions */}
             <div className="flex items-center gap-2">
+              <CountryCurrencySelector />
+              
               <button
                 onClick={() => onOpenConsultation()}
-                className="px-3.5 py-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-xl font-bold text-[11px] uppercase tracking-wider shadow-md shrink-0 flex items-center gap-1"
+                className="px-3 py-1.5 bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-xl font-bold text-[11px] uppercase tracking-wider shadow-md shrink-0 flex items-center gap-1"
               >
                 <span>Consult</span>
                 <ArrowUpRight className="w-3 h-3" />
