@@ -119,8 +119,8 @@ export const DocumentsClearingPage: React.FC<DocumentsClearingPageProps> = ({ on
             >
               <div>
                 <div className="flex justify-between items-start mb-4">
-                  <div className="w-12 h-12 rounded-2xl bg-blue-600/20 border border-blue-500/30 text-blue-400 flex items-center justify-center font-bold text-xl">
-                    🏢
+                  <div className="w-12 h-12 rounded-2xl bg-blue-600/20 border border-blue-500/30 text-blue-400 flex items-center justify-center font-bold text-2xl">
+                    {service.flag || '📄'}
                   </div>
                   <span className="px-3 py-1 bg-slate-950 border border-slate-800 text-blue-400 text-[10px] font-bold rounded-full">
                     Est. {service.timeline}

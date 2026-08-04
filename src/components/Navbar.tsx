@@ -5,7 +5,7 @@ import {
   Menu, X, Phone, Mail, Clock, MapPin, ArrowUpRight, ChevronDown, 
   Building2, Laptop, ShieldCheck, FileText, Award, FileCheck, 
   Calculator, Landmark, Code2, Cpu, ShieldAlert, Cloud, Server, 
-  Camera, TrendingUp, Users, CheckCircle2, HelpCircle, Briefcase, Star, Workflow,
+  Camera, TrendingUp, Users, CheckCircle2, HelpCircle, Briefcase, Star, Workflow, Plane,
   Linkedin, Twitter, MessageCircle, ExternalLink, Sparkles
 } from 'lucide-react';
 import { COMPANY_INFO } from '../data/companyData';
@@ -47,12 +47,16 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenConsultation }) => {
   const docServices = [
     { title: 'Mainland & Free Zone Setup', path: '/documents-clearing/business-setup', desc: 'Commercial, Professional & Industrial licenses', icon: Building2 },
     { title: '10-Year Golden Visa', path: '/documents-clearing/golden-visa', desc: 'Investors, Executives & Exceptional Talents', icon: Award },
-    { title: 'Investor & Employment Visas', path: '/documents-clearing/visa-processing', desc: 'Partner, Residence & Family sponsorship', icon: FileCheck },
-    { title: 'Labour & Corporate PRO', path: '/documents-clearing/pro-services', desc: 'MOHRE, Immigration & Quota approvals', icon: FileText },
-    { title: 'Trade License Renewal', path: '/documents-clearing/trade-license', desc: 'Lease contracts & DED amendments', icon: FileText },
+    { title: 'UAE Tourist Visa 🇦🇪', path: '/services/uae-tourist-visa', desc: '30 & 60-Day Express extensions & entry permits', icon: FileCheck },
+    { title: 'UK Tourist Visa 🇬🇧', path: '/services/uk-tourist-visa', desc: 'Standard visitor visa & VFS appointment filing', icon: FileCheck },
+    { title: 'USA Tourist Visa 🇺🇸', path: '/services/us-tourist-visa', desc: 'US B1/B2 DS-160 filing & interview coaching', icon: FileCheck },
+    { title: 'Canada Tourist Visa 🇨🇦', path: '/services/canada-tourist-visa', desc: 'Canada V-1 visitor visa & biometrics portal', icon: FileCheck },
+    { title: 'Australia Tourist Visa 🇦🇺', path: '/services/australia-tourist-visa', desc: 'Subclass 600 ImmiAccount eVisa filing', icon: FileCheck },
+    { title: 'Schengen Europe Visa 🇪🇺', path: '/services/schengen-tourist-visa', desc: 'VFS/BLS slot booking & travel insurance', icon: FileCheck },
+    { title: 'Europe Work Permits', path: '/services/europe-work-permits', desc: 'Poland, Czech, Hungary & Malta work visas', icon: Briefcase },
+    { title: 'Airline Ticket Booking', path: '/services/airline-ticket-booking', desc: 'Confirmed corporate flights & dummy tickets', icon: Plane },
+    { title: 'Ejari Services 🏢', path: '/services/ejari-services', desc: 'Express DLD tenancy contract attestation', icon: FileText },
     { title: 'Emirates ID & Medical Typing', path: '/documents-clearing/emirates-id', desc: 'Express VIP medical fitness processing', icon: ShieldCheck },
-    { title: 'Corporate Tax & VAT Filing', path: '/documents-clearing/corporate-tax-vat', desc: 'Federal Tax Authority registration & audits', icon: Calculator },
-    { title: 'Corporate Bank Accounts', path: '/documents-clearing/bank-account', desc: 'WIO, FAB, ENBD & Mashreq assistance', icon: Landmark },
   ];
 
   const itServices = [

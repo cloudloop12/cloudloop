@@ -1,6 +1,7 @@
 import { DetailedService, BlogPost, CareerOpening, TeamMember } from '../types';
+import { NEW_SERVICES_DATA } from './newServicesData';
 
-export const DETAILED_SERVICES_MAP: Record<string, DetailedService> = {
+export const BASE_SERVICES_MAP: Record<string, DetailedService> = {
   // --- DOCUMENTS CLEARING DIVISION SERVICES ---
   'business-setup': {
     id: 'doc-business-setup',
@@ -592,6 +593,18 @@ export const DETAILED_SERVICES_MAP: Record<string, DetailedService> = {
       },
     ],
   },
+};
+
+export const DETAILED_SERVICES_MAP: Record<string, DetailedService> = {
+  ...BASE_SERVICES_MAP,
+  ...NEW_SERVICES_DATA,
+  'usa-tourist-visa': NEW_SERVICES_DATA['us-tourist-visa'],
+  'international-tourist-visas': NEW_SERVICES_DATA['international-tourist-visa'],
+  'uk-visa': NEW_SERVICES_DATA['uk-tourist-visa'],
+  'us-visa': NEW_SERVICES_DATA['us-tourist-visa'],
+  'canada-visa': NEW_SERVICES_DATA['canada-tourist-visa'],
+  'australia-visa': NEW_SERVICES_DATA['australia-tourist-visa'],
+  'schengen-visa': NEW_SERVICES_DATA['schengen-tourist-visa'],
 };
 
 export const DETAILED_SERVICES = Object.values(DETAILED_SERVICES_MAP).map(service => ({

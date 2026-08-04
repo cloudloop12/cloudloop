@@ -115,6 +115,23 @@ export interface DetailedService {
   requiredDocuments: string[];
   timeline: string;
   pricingStarting: string;
-  faqs: { question: string; answer: string }[];
+  faqs: { question: string; answer: string; q?: string; a?: string }[];
   technologies?: string[];
+  flag?: string;
+  heroImage?: string;
+  requirements?: {
+    passport?: string[];
+    photo?: string[];
+    eligibility?: string[];
+    supportingDocs?: string[];
+  };
+  processingTimes?: {
+    standard: { time: string; desc: string };
+    express?: { time: string; desc: string };
+  };
+  pricingPackage?: {
+    startingPrice: string;
+    whatsIncluded: string[];
+    addOns?: { name: string; price: string }[];
+  };
 }

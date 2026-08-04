@@ -14,6 +14,7 @@ import { HomePage } from './pages/HomePage';
 import { AboutPage } from './pages/AboutPage';
 import { DocumentsClearingPage } from './pages/DocumentsClearingPage';
 import { DocServiceDetailPage } from './pages/DocServiceDetailPage';
+import { ServiceDetailPage } from './pages/ServiceDetailPage';
 import { ITPage } from './pages/ITPage';
 import { ITServiceDetailPage } from './pages/ITServiceDetailPage';
 import { WhyChooseUsPage } from './pages/WhyChooseUsPage';
@@ -104,7 +105,11 @@ export default function App() {
               element={<AboutPage onOpenConsultation={handleOpenConsultation} />}
             />
 
-            {/* Documents Clearing Division Routes */}
+            {/* Services & Documents Clearing Division Routes */}
+            <Route
+              path="/services/:slug"
+              element={<ServiceDetailPage onOpenConsultation={handleOpenConsultation} />}
+            />
             <Route
               path="/documents-clearing"
               element={<DocumentsClearingPage onOpenConsultation={handleOpenConsultation} />}
