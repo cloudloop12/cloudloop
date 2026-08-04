@@ -1,6 +1,14 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { COUNTRIES_DATA, DEFAULT_COUNTRY, FALLBACK_RATES_BASE_AED, CountryCurrency } from '../data/countriesData';
 
+/**
+ * FEATURE FLAG: Country & Currency Localization
+ * Set to `true` to re-enable automatic IP country detection, live exchange rates,
+ * dual-currency display, and the manual country/currency switcher.
+ * Set to `false` to disable detection/fetching and show all prices strictly in AED.
+ */
+export const ENABLE_COUNTRY_CURRENCY_LOCALIZATION = false;
+
 const MANUAL_PREF_KEY = 'cloudloop_manual_country_pref';
 const AUTO_COUNTRY_KEY = 'cloudloop_auto_country_cache';
 const RATES_CACHE_KEY = 'cloudloop_rates_cache_v1';
@@ -44,6 +52,13 @@ export const CurrencyProvider: React.FC<{ children: ReactNode }> = ({ children }
 
   // 1. Fetch live exchange rates against base currency AED
   const fetchLiveRates = useCallback(async () => {
+    // Feature temporarily disabled. Return fallback base rates without API calls.
+    if (!ENABLE_COUNTRY_CURRENCY_LOCALIZATION) {
+      setRates(FALLBACK_RATES_BASE_AED);
+      setIsLoadingRates(false);
+      return;
+    }
+
     setIsLoadingRates(true);
 
     // Try reading valid cached rates first
@@ -108,6 +123,14 @@ export const CurrencyProvider: React.FC<{ children: ReactNode }> = ({ children }
 
   // 2. Auto Detect Visitor Country via IP
   const detectCountry = useCallback(async () => {
+    // Feature temporarily disabled. Lock to default country (UAE) without geo IP lookups.
+    if (!ENABLE_COUNTRY_CURRENCY_LOCALIZATION) {
+      setSelectedCountry(DEFAULT_COUNTRY);
+      setIsAutoDetected(true);
+      setIsLoadingLocation(false);
+      return;
+    }
+
     setIsLoadingLocation(true);
 
     // Check if user set a manual override previously
@@ -263,6 +286,18 @@ export const CurrencyProvider: React.FC<{ children: ReactNode }> = ({ children }
 
   // Helper to parse strings like "AED 2,500" or "2500" or "3,500 AED" and produce clean dual pricing
   const formatPrice = (priceInput: string | number) => {
+    // Feature temporarily disabled. Format strictly in AED without converted currency string.
+    if (!ENABLE_COUNTRY_CURRENCY_LOCALIZATION) {
+      const str = typeof priceInput === 'number' ? `AED ${priceInput.toLocaleString('en-US')}` : String(priceInput);
+      return {
+        aedFormatted: str.includes('AED') ? str : `AED ${str}`,
+        convertedFormatted: null,
+        rawAed: typeof priceInput === 'number' ? priceInput : 0,
+        rawConverted: typeof priceInput === 'number' ? priceInput : 0,
+        currencyCode: 'AED',
+      };
+    }
+
     if (typeof priceInput === 'number') {
       const conv = convertAed(priceInput);
       return {

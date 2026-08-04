@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Globe, Search, Check, RefreshCw, X, ChevronDown, Sparkles } from 'lucide-react';
 import { COUNTRIES_DATA, CountryCurrency } from '../data/countriesData';
-import { useCurrency } from '../context/CurrencyContext';
+import { useCurrency, ENABLE_COUNTRY_CURRENCY_LOCALIZATION } from '../context/CurrencyContext';
 
 const GCC_CODES = ['AE', 'SA', 'QA', 'OM', 'KW', 'BH'];
 const EUROPE_CODES = ['GB', 'DE', 'FR', 'IT', 'ES', 'CH', 'RU', 'TR'];
@@ -10,6 +10,10 @@ const AMERICAS_CODES = ['US', 'CA', 'BR', 'MX'];
 const ASIA_PACIFIC_CODES = ['PK', 'IN', 'AU', 'SG', 'CN', 'JP', 'PH', 'BD', 'MY', 'ID', 'NZ'];
 
 export const CountryCurrencySelector: React.FC = () => {
+  if (!ENABLE_COUNTRY_CURRENCY_LOCALIZATION) {
+    return null; // Feature temporarily disabled
+  }
+
   const { selectedCountry, changeCountry, isAutoDetected, resetToAutoDetect, isLoadingLocation } = useCurrency();
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
