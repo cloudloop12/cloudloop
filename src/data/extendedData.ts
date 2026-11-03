@@ -629,7 +629,7 @@ export const CAREERS_DATA: CareerOpening[] = [
     id: 'job-1',
     title: 'Senior Corporate PRO Specialist',
     division: 'documents',
-    location: 'Dubai, UAE (Business Bay Office)',
+    location: 'Dubai, UAE (Rigga Business Centre Office)',
     type: 'Full-time',
     department: 'Government Relations & Immigration',
     description: 'We are seeking an experienced, bilingual (Arabic & English) Corporate PRO Specialist to manage mainland DED, Free Zone, MOHRE, and GDRFA immigration clearing for high-profile enterprise clients.',
@@ -664,7 +664,7 @@ export const CAREERS_DATA: CareerOpening[] = [
     ],
     benefits: [
       'Attractive tax-free salary in Dubai',
-      'Flexible hybrid remote / Business Bay office setup',
+      'Flexible hybrid remote / office setup in Dubai',
       'Latest Apple MacBook Pro & hardware equipment provided',
       'Health insurance & continuous technical certification sponsorship (AWS/Azure)',
     ],
@@ -707,7 +707,7 @@ export const CAREERS_DATA: CareerOpening[] = [
     benefits: [
       'High base salary + uncapped monthly commission structure',
       'Comprehensive company visa & medical insurance',
-      'Luxury office environment in Business Bay',
+      'Luxury office environment in Dubai',
     ],
   },
 ];

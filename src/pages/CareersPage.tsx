@@ -40,7 +40,7 @@ export const CareersPage: React.FC = () => {
 
   const culturePoints = [
     { title: 'Tax-Free UAE Compensation', desc: 'Competitive tax-free salaries with performance bonuses and annual profit sharing.' },
-    { title: 'Dual-Discipline Knowledge', desc: 'Work alongside government PRO experts and elite software engineers in Business Bay.' },
+    { title: 'Dual-Discipline Knowledge', desc: 'Work alongside government PRO experts and elite software engineers in Dubai.' },
     { title: 'Executive Growth Track', desc: 'Accelerated promotion tracks for outstanding contributors across Dubai & Abu Dhabi.' },
     { title: 'Full UAE Medical & Visa', desc: 'Comprehensive VIP private health insurance, residency visa processing, and annual flight allowance.' },
   ];
@@ -168,7 +168,7 @@ export const CareersPage: React.FC = () => {
               <div className="p-8 bg-blue-950/40 border border-blue-500/40 rounded-2xl text-center space-y-3">
                 <CheckCircle2 className="w-12 h-12 text-blue-400 mx-auto" />
                 <h3 className="text-lg font-bold text-white uppercase">Application Submitted Successfully!</h3>
-                <p className="text-xs text-slate-300">Our HR Talent Acquisition team in Business Bay will review your application and reach out within 48 hours.</p>
+                <p className="text-xs text-slate-300">Our HR Talent Acquisition team in Dubai will review your application and reach out within 48 hours.</p>
               </div>
             ) : (
               <form onSubmit={handleApply} className="space-y-4">

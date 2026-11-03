@@ -9,7 +9,7 @@ export const ContactPage: React.FC = () => {
     <div className="pt-24 pb-20 bg-slate-950 text-white min-h-screen">
       <SEOHead
         title="Contact Us | Cloudloop Group Headquarters Dubai"
-        description="Get in touch with Cloudloop Group headquarters in Business Bay Dubai. Direct phone: +971 4 388 9210, Email: info@cloudloop.ae, P.O. Box 418892."
+        description="Get in touch with Cloudloop Group headquarters at Office No: 1001-04, Rigga Business Centre, Ibis Hotel, Dubai, UAE. Direct phone: +971 55 612 6050, Email: info@cloudloopgroup.com."
       />
 
       {/* Hero Banner */}
@@ -22,7 +22,7 @@ export const ContactPage: React.FC = () => {
             Contact <span className="text-blue-500">Cloudloop Group</span>
           </h1>
           <p className="text-base sm:text-lg text-slate-300 leading-relaxed font-normal max-w-2xl mx-auto">
-            Visit our Business Bay office in Dubai or schedule a remote consultation with our Documents Clearing and IT Directors.
+            Visit our office at Rigga Business Centre, Ibis Hotel in Dubai or schedule a remote consultation with our Documents Clearing and IT Directors.
           </p>
         </div>
       </section>
@@ -34,14 +34,14 @@ export const ContactPage: React.FC = () => {
       <section className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         <div className="text-center max-w-2xl mx-auto">
           <h2 className="text-3xl font-extrabold text-white uppercase">Our Location in Dubai</h2>
-          <p className="text-xs text-slate-400 mt-2">Opal Tower, Business Bay — Convenient access with underground client parking.</p>
+          <p className="text-xs text-slate-400 mt-2">Office No: 1001-04, Rigga Business Centre, Ibis Hotel, Dubai, UAE — Convenient access with client parking.</p>
         </div>
 
         {/* Google Map Simulation / Embed */}
         <div className="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden h-96 relative shadow-2xl">
           <iframe
             title="Cloudloop Group Location Map"
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3610.1786539269224!2d55.27438437609279!3d25.186729931707015!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f68307d8123ad%3A0xa599540b7d7f1d4b!2sOpal%20Tower!5e0!3m2!1sen!2sae!4v1700000000000!5m2!1sen!2sae"
+            src={COMPANY_INFO.googleMapsEmbed}
             className="w-full h-full border-0 filter grayscale invert contrast-125 opacity-80"
             allowFullScreen={false}
             loading="lazy"

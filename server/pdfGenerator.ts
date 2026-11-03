@@ -95,9 +95,9 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
       doc.fontSize(11).font('Helvetica-Bold').fillColor('#0f172a').text('Cloudloop Group LLC', 320, y + 16);
       doc.fontSize(9).font('Helvetica').fillColor('#334155');
       doc.text('Documents Clearing & IT Services Division', 320, y + 32);
-      doc.text('Level 18, Business Bay Tower, Sheikh Zayed Rd', 320, y + 46);
-      doc.text('Dubai, United Arab Emirates', 320, y + 60);
-      doc.text('Email: info@cloudloop.ae | Phone: +971 4 800 5667', 320, y + 74);
+      doc.text('Office No: 1001-04, Rigga Business Centre', 320, y + 46);
+      doc.text('Ibis Hotel, Dubai, UAE', 320, y + 60);
+      doc.text('Email: info@cloudloop.ae | Phone: +971 55 612 6050', 320, y + 74);
 
       y = Math.max(clientInfoY + 20, y + 96);
 

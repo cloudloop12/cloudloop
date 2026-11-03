@@ -361,7 +361,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ prefilledService
                 className="filter grayscale contrast-125 brightness-90"
               />
               <div className="absolute top-3 left-3 px-3 py-1 rounded-lg bg-slate-950/90 border border-slate-800 text-[11px] text-cyan-300 font-semibold backdrop-blur-md">
-                📍 Sheikh Zayed Road • Dubai, UAE
+                📍 Rigga Business Centre, Ibis Hotel • Dubai, UAE
               </div>
             </div>
 

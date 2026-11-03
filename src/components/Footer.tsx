@@ -248,7 +248,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenConsultation }) => {
 
           <div className="text-center md:text-right">
             <p className="text-xs text-white font-bold tracking-tight">{COMPANY_INFO.phone}</p>
-            <p className="text-[10px] text-slate-400 uppercase tracking-widest font-medium">24/7 Priority Support • Business Bay, Dubai, UAE</p>
+            <p className="text-[10px] text-slate-400 uppercase tracking-widest font-medium">24/7 Priority Support • Rigga Business Centre, Dubai, UAE</p>
           </div>
 
           <div className="flex flex-wrap items-center space-x-6 text-[11px]">

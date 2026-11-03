@@ -142,8 +142,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenConsultation }) => {
             </a>
             <span className="text-slate-700">|</span>
             <span className="flex items-center gap-1.5 text-slate-300">
-              <MapPin className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Business Bay, Dubai, UAE</span>
+              <MapPin className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+              <span>Office No: 1001-04, Rigga Business Centre, Ibis Hotel, Dubai, UAE</span>
             </span>
           </div>
 
@@ -608,8 +608,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenConsultation }) => {
                     <span>{COMPANY_INFO.email}</span>
                   </a>
                   <div className="flex items-center gap-2 text-slate-400">
-                    <MapPin className="w-3.5 h-3.5 text-cyan-400" />
-                    <span>Business Bay, Dubai, UAE</span>
+                    <MapPin className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                    <span>Office No: 1001-04, Rigga Business Centre, Ibis Hotel, Dubai, UAE</span>
                   </div>
                 </div>
 
@@ -647,7 +647,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenConsultation }) => {
               <ArrowUpRight className="w-4 h-4" />
             </button>
             <div className="text-center text-[10px] text-slate-400">
-              Official Regulated Partner • Business Bay, Dubai UAE
+              Official Regulated Partner • Rigga Business Centre, Dubai, UAE
             </div>
           </div>
 

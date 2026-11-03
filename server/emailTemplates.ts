@@ -29,8 +29,8 @@ export function getFooterHTML(): string {
     <!-- Enterprise Footer -->
     <tr>
       <td style="background-color: #070a12; padding: 28px 30px; text-align: center; border-top: 1px solid #1e293b; color: #64748b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 12px; line-height: 1.6;">
-        <p style="margin: 0 0 8px 0; color: #94a3b8; font-weight: 600;">Cloudloop Group LLC • Level 18, Business Bay Tower, Sheikh Zayed Road, Dubai, UAE</p>
-        <p style="margin: 0 0 12px 0;">TRN: 100489201900003 | Phone: +971 4 800 5667 | Email: support@cloudloop.ae</p>
+        <p style="margin: 0 0 8px 0; color: #94a3b8; font-weight: 600;">Cloudloop Group LLC • Office No: 1001-04, Rigga Business Centre, Ibis Hotel, Dubai, UAE</p>
+        <p style="margin: 0 0 12px 0;">TRN: 100489201900003 | Phone: +971 55 612 6050 | Email: support@cloudloop.ae</p>
         <div style="margin: 12px 0;">
           <a href="https://cloudloop.ae" style="color: #38bdf8; text-decoration: none; font-weight: 600; margin: 0 8px;">Website</a> •
           <a href="https://wa.me/971556126050" style="color: #25d366; text-decoration: none; font-weight: 600; margin: 0 8px;">WhatsApp Desk</a> •

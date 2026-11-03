@@ -7,10 +7,10 @@ export const COMPANY_INFO = {
   phoneFormatted: '+971556126050',
   whatsappNumber: '971556126050',
   email: 'info@cloudloopgroup.com',
-  address: 'Level 18, Business Bay Tower, Sheikh Zayed Road, Dubai, UAE',
-  poBox: 'P.O. Box 418892, Dubai, United Arab Emirates',
+  address: 'Office No: 1001-04, Rigga Business Centre, Ibis Hotel, Dubai, UAE',
+  poBox: 'Dubai, United Arab Emirates',
   workingHours: 'Monday – Saturday: 8:30 AM – 6:30 PM (GST)',
-  googleMapsEmbed: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3610.178653926721!2d55.27218777610086!3d25.197196931707925!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f682829c85e07%3A0xa5eb94716e297f0c!2sSheikh%20Zayed%20Rd%20-%20Dubai%20-%20United%20Arab%20Emirates!5e0!3m2!1sen!2sae!4v1700000000000!5m2!1sen!2sae',
+  googleMapsEmbed: 'https://maps.google.com/maps?q=Rigga+Business+Centre,+Ibis+Hotel,+Dubai,+UAE&t=&z=15&ie=UTF8&iwloc=&output=embed',
 };
 
 export const DIVISIONS_INFO = {

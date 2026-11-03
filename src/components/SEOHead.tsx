@@ -144,7 +144,7 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
         email: 'info@cloudloopgroup.com',
         address: {
           '@type': 'PostalAddress',
-          streetAddress: 'Level 18, Business Bay Tower, Sheikh Zayed Road',
+          streetAddress: 'Office No: 1001-04, Rigga Business Centre, Ibis Hotel',
           addressLocality: 'Dubai',
           addressRegion: 'Dubai',
           postalCode: '00000',
@@ -152,8 +152,8 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
         },
         geo: {
           '@type': 'GeoCoordinates',
-          latitude: 25.1857,
-          longitude: 55.2638
+          latitude: 25.2631,
+          longitude: 55.3262
         },
         openingHoursSpecification: [
           {
