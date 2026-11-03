@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Building2, Laptop, Phone, Mail, MapPin, ArrowUpRight, ShieldCheck, Send, CheckCircle2, Terminal } from 'lucide-react';
+import { Building2, Laptop, Phone, Mail, MapPin, ArrowUpRight, ShieldCheck, Send, CheckCircle2 } from 'lucide-react';
 import { COMPANY_INFO } from '../data/companyData';
 import { DivisionType } from '../types';
 import { Logo } from './Logo';
@@ -255,10 +255,6 @@ export const Footer: React.FC<FooterProps> = ({ onOpenConsultation }) => {
             <span>© 2026 <strong>Cloudloop Group LLC</strong></span>
             <Link to="/contact" className="hover:text-white transition-colors">Privacy Policy</Link>
             <Link to="/contact" className="hover:text-white transition-colors">Terms of Service</Link>
-            <Link to="/email-debug" className="text-cyan-400 font-bold hover:underline flex items-center gap-1">
-              <Terminal className="w-3 h-3" />
-              <span>Email Debug System</span>
-            </Link>
           </div>
         </div>
 
